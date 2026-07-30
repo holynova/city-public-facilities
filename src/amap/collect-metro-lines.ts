@@ -15,6 +15,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 19 }, (_, index) => `地铁${index + 1}号线`), "地铁22号线", "地铁24号线", "地铁25号线", "地铁27号线", "S1线", "首都机场线", "大兴机场线", "亦庄线", "昌平线", "房山线", "燕房线", "西郊线"],
     outputFile: "amap-metro-lines.json",
   },
+  "杭州市": {
+    cityCode: "0571",
+    lineQueries: [...Array.from({ length: 12 }, (_, index) => `地铁${index + 1}号线`), "地铁16号线", "地铁19号线", "机场快线", "杭海城际"],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
 
 export async function collectMetroFromLines(snapshot: string, city = "上海市"): Promise<AmapCollectedFacilityRecord[]> {
@@ -24,7 +29,7 @@ export async function collectMetroFromLines(snapshot: string, city = "上海市"
   const lines = new Map<string, AmapBusLine>();
   for (const query of config.lineQueries) {
     console.error(`Amap metro line search: ${query}`);
-    for (const line of await client.searchBusLines(query)) {
+    for (const line of await client.searchBusLines(query, city)) {
       if (!isCityRailLine(line, config.cityCode)) continue;
       const canonical = line.name.replace(/\(.*/, "");
       if (!lines.has(canonical)) lines.set(canonical, line);
@@ -45,7 +50,7 @@ export async function collectMetroFromLines(snapshot: string, city = "上海市"
 }
 
 function isCityRailLine(line: AmapBusLine, cityCode: string): boolean {
-  return line.citycode === cityCode && (line.type === "地铁" || /磁浮|磁悬浮|市域|机场线|S1/.test(line.name));
+  return line.citycode === cityCode && (line.type === "地铁" || /磁浮|磁悬浮|市域|机场线|机场快线|城际|S1/.test(line.name));
 }
 
 function mergeStation(records: Map<string, AmapCollectedFacilityRecord>, stop: AmapBusStop, lineName: string): void {

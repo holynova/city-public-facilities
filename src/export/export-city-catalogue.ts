@@ -23,7 +23,7 @@ export async function exportCityCatalogue(options: { citySlug: string; snapshot:
     readJson<AmapCollectedFacilityRecord[]>(join(directory, "amap-city-catalogue.json")),
     readJson<AmapCollectedFacilityRecord[]>(join(directory, "amap-metro-lines.json")),
   ]);
-  const records = [...catalogue.filter(shouldExportCatalogueRecord), ...metro].map(toExport).sort((left, right) => left.category.localeCompare(right.category, "zh-CN") || left.name.localeCompare(right.name, "zh-CN"));
+  const records = [...catalogue.filter((record) => shouldExportCatalogueRecord(record, options.citySlug)), ...metro].map(toExport).sort((left, right) => left.category.localeCompare(right.category, "zh-CN") || left.name.localeCompare(right.name, "zh-CN"));
   const byCategory = Object.fromEntries(Object.entries(Object.groupBy(records, (record) => record.category)).map(([category, group]) => [category, group?.length ?? 0]));
   const report = { generatedAt: new Date().toISOString(), city: options.citySlug, totalRecords: records.length, byCategory, caveats: ["Coordinates are GCJ-02 as returned by Amap.", "Hospital grades are Amap keyword candidates and need official-source verification before being treated as authoritative.", "Catalogue categories are Amap-derived and may include omissions or stale POIs."] };
   const output = join("outputs", options.snapshot);
@@ -38,11 +38,15 @@ function toExport(record: AmapCollectedFacilityRecord): ExportRecord {
   return { address: record.address, category: record.category, classification_status: record.classificationStatus, coordinate_system: "GCJ-02", district: record.district, latitude, longitude, match_confidence: "", name: record.name, source_id: record.sourceId, source_url: record.sourceUrl, verification_note: `Amap POI ${record.amap.poiId}; query: ${record.searchEvidence.join(" | ")}` };
 }
 
-function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord): boolean {
-  if (record.category === "landmark.city_landmark" && record.searchEvidence.includes("国贸CBD")) return false;
-  if (record.category === "transport.airport") return ["北京首都国际机场", "北京大兴国际机场"].includes(record.name);
-  if (record.category === "landmark.city_landmark") {
+function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
+  if (citySlug === "beijing" && record.category === "landmark.city_landmark" && record.searchEvidence.includes("国贸CBD")) return false;
+  if (citySlug === "beijing" && record.category === "transport.airport") return ["北京首都国际机场", "北京大兴国际机场"].includes(record.name);
+  if (citySlug === "beijing" && record.category === "landmark.city_landmark") {
     return ["天安门", "故宫博物院", "天坛公园", "颐和园", "国家体育场", "国家游泳中心", "北京环球度假区", "什刹海", "北京坊", "中国国际贸易中心", "国贸商城"].includes(record.name);
+  }
+  if (citySlug === "hangzhou" && record.category === "transport.airport") return record.name === "杭州萧山国际机场";
+  if (citySlug === "hangzhou" && record.category === "landmark.city_landmark") {
+    return ["西湖", "灵隐寺", "雷峰塔景区", "雷峰塔景区雷峰塔", "六和塔文化公园", "钱江新城", "清河坊历史文化特色街区", "良渚古城遗址公园"].includes(record.name);
   }
   return true;
 }
