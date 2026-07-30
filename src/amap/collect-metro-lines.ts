@@ -25,6 +25,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 14 }, (_, index) => `地铁${index + 1}号线`), "地铁18号线", "地铁21号线", "地铁22号线", "广佛线", "APM线"],
     outputFile: "amap-metro-lines.json",
   },
+  "深圳市": {
+    cityCode: "0755",
+    lineQueries: [...Array.from({ length: 12 }, (_, index) => `地铁${index + 1}号线`), "地铁14号线", "地铁16号线", "地铁20号线", "地铁6号线支线"],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
 
 export async function collectMetroFromLines(snapshot: string, city = "上海市"): Promise<AmapCollectedFacilityRecord[]> {

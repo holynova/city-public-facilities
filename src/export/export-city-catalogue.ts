@@ -52,6 +52,10 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "guangzhou" && record.category === "landmark.city_landmark") {
     return ["广州塔", "陈家祠", "陈家祠堂", "沙面", "沙面岛", "北京路步行街", "永庆坊", "白云山风景名胜区"].includes(record.name);
   }
+  if (citySlug === "shenzhen" && record.category === "transport.airport") return record.name === "深圳宝安国际机场";
+  if (citySlug === "shenzhen" && record.category === "landmark.city_landmark") {
+    return ["平安金融中心", "世界之窗", "锦绣中华民俗村", "东门老街", "大梅沙海滨公园", "深圳湾"].includes(record.name);
+  }
   return true;
 }
 function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
