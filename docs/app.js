@@ -28,6 +28,7 @@ const CITIES = {
   guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔" },
   shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园" },
   suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园" },
+  hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园" },
 };
 
 let facilities = [];
