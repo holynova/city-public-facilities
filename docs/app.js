@@ -25,6 +25,7 @@ const CITIES = {
   shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园" },
   beijing: { name: "北京", geocodeName: "北京市", example: "天安门" },
   hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖" },
+  guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔" },
 };
 
 let facilities = [];

@@ -20,6 +20,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 12 }, (_, index) => `地铁${index + 1}号线`), "地铁16号线", "地铁19号线", "机场快线", "杭海城际"],
     outputFile: "amap-metro-lines.json",
   },
+  "广州市": {
+    cityCode: "020",
+    lineQueries: [...Array.from({ length: 14 }, (_, index) => `地铁${index + 1}号线`), "地铁18号线", "地铁21号线", "地铁22号线", "广佛线", "APM线"],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
 
 export async function collectMetroFromLines(snapshot: string, city = "上海市"): Promise<AmapCollectedFacilityRecord[]> {
@@ -31,6 +36,7 @@ export async function collectMetroFromLines(snapshot: string, city = "上海市"
     console.error(`Amap metro line search: ${query}`);
     for (const line of await client.searchBusLines(query, city)) {
       if (!isCityRailLine(line, config.cityCode)) continue;
+      if (city === "广州市" && /^佛山地铁/.test(line.name)) continue;
       const canonical = line.name.replace(/\(.*/, "");
       if (!lines.has(canonical)) lines.set(canonical, line);
     }

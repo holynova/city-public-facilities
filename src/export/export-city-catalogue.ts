@@ -23,7 +23,7 @@ export async function exportCityCatalogue(options: { citySlug: string; snapshot:
     readJson<AmapCollectedFacilityRecord[]>(join(directory, "amap-city-catalogue.json")),
     readJson<AmapCollectedFacilityRecord[]>(join(directory, "amap-metro-lines.json")),
   ]);
-  const records = [...catalogue.filter((record) => shouldExportCatalogueRecord(record, options.citySlug)), ...metro].map(toExport).sort((left, right) => left.category.localeCompare(right.category, "zh-CN") || left.name.localeCompare(right.name, "zh-CN"));
+  const records = dedupeCityLandmarks([...catalogue.filter((record) => shouldExportCatalogueRecord(record, options.citySlug)), ...metro.filter((record) => shouldExportMetroRecord(record, options.citySlug))]).map(toExport).sort((left, right) => left.category.localeCompare(right.category, "zh-CN") || left.name.localeCompare(right.name, "zh-CN"));
   const byCategory = Object.fromEntries(Object.entries(Object.groupBy(records, (record) => record.category)).map(([category, group]) => [category, group?.length ?? 0]));
   const report = { generatedAt: new Date().toISOString(), city: options.citySlug, totalRecords: records.length, byCategory, caveats: ["Coordinates are GCJ-02 as returned by Amap.", "Hospital grades are Amap keyword candidates and need official-source verification before being treated as authoritative.", "Catalogue categories are Amap-derived and may include omissions or stale POIs."] };
   const output = join("outputs", options.snapshot);
@@ -48,7 +48,23 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "hangzhou" && record.category === "landmark.city_landmark") {
     return ["西湖", "灵隐寺", "雷峰塔景区", "雷峰塔景区雷峰塔", "六和塔文化公园", "钱江新城", "清河坊历史文化特色街区", "良渚古城遗址公园"].includes(record.name);
   }
+  if (citySlug === "guangzhou" && record.category === "transport.airport") return record.name === "广州白云国际机场";
+  if (citySlug === "guangzhou" && record.category === "landmark.city_landmark") {
+    return ["广州塔", "陈家祠", "陈家祠堂", "沙面", "沙面岛", "北京路步行街", "永庆坊", "白云山风景名胜区"].includes(record.name);
+  }
   return true;
+}
+function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
+  return citySlug !== "guangzhou" || record.searchEvidence.some((line) => !line.startsWith("佛山地铁"));
+}
+function dedupeCityLandmarks(records: AmapCollectedFacilityRecord[]): AmapCollectedFacilityRecord[] {
+  const names = new Set<string>();
+  return records.filter((record) => {
+    if (record.category !== "landmark.city_landmark") return true;
+    if (names.has(record.name)) return false;
+    names.add(record.name);
+    return true;
+  });
 }
 async function readJson<T>(file: string): Promise<T> { return JSON.parse(await readFile(file, "utf8")) as T; }
 function toCsv(records: ExportRecord[]): string {

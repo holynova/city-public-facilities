@@ -95,7 +95,42 @@ const HANGZHOU_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
-const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES };
+const GUANGZHOU_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|书屋|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "音乐厅", allPages: true, accepts: named(/音乐厅|音乐堂|大剧院|剧院|演艺中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.big_box_retail", keywords: "山姆会员商店", accepts: typedNamed("06", /山姆会员商店/) },
+  { category: "commerce.big_box_retail", keywords: "麦德龙", accepts: typedNamed("06", /麦德龙/) },
+  { category: "commerce.big_box_retail", keywords: "宜家家居", accepts: typedNamed("06", /宜家/) },
+  { category: "commerce.big_box_retail", keywords: "开市客", accepts: typedNamed("06", /开市客|Costco/i) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|万象|天环|太古汇|正佳|天河城|K11|永旺/) },
+  { category: "transport.railway_station", keywords: "广州站", accepts: typedNamed("150200", /^广州站$/) },
+  { category: "transport.railway_station", keywords: "广州南站", accepts: typedNamed("150200", /^广州南站$/) },
+  { category: "transport.railway_station", keywords: "广州东站", accepts: typedNamed("150200", /^广州东站$/) },
+  { category: "transport.railway_station", keywords: "广州北站", accepts: typedNamed("150200", /^广州北站$/) },
+  { category: "transport.railway_station", keywords: "白云站", accepts: typedNamed("150200", /^广州白云站$/) },
+  { category: "transport.airport", keywords: "广州白云国际机场", accepts: typedNamed("150104", /广州白云国际机场/) },
+  { category: "landmark.city_landmark", keywords: "广州塔", accepts: named(/广州塔/) },
+  { category: "landmark.city_landmark", keywords: "陈家祠", accepts: named(/陈家祠/) },
+  { category: "landmark.city_landmark", keywords: "沙面", accepts: named(/沙面/) },
+  { category: "landmark.city_landmark", keywords: "北京路步行街", accepts: named(/北京路步行街/) },
+  { category: "landmark.city_landmark", keywords: "永庆坊", accepts: named(/永庆坊/) },
+  { category: "landmark.city_landmark", keywords: "白云山风景名胜区", accepts: named(/白云山/) },
+  { category: "park.major_city_park", keywords: "越秀公园", accepts: typedNamed("11", /^越秀公园$/) },
+  { category: "park.major_city_park", keywords: "海珠湿地公园", accepts: typedNamed("11", /海珠.*湿地/) },
+  { category: "park.major_city_park", keywords: "流花湖公园", accepts: typedNamed("11", /^流花湖公园$/) },
+  { category: "park.major_city_park", keywords: "天河公园", accepts: typedNamed("11", /^天河公园$/) },
+  { category: "park.major_city_park", keywords: "华南国家植物园", accepts: typedNamed("11", /华南.*植物园/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
+const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES };
 
 export async function collectCityCatalogue(snapshot: string, city = "北京市"): Promise<AmapCollectedFacilityRecord[]> {
   const queries = CITY_QUERIES[city];
