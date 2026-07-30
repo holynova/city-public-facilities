@@ -21,6 +21,7 @@ const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_LIMIT = 5;
+const HISTORY_VISIBLE_LIMIT = 2;
 const CITIES = {
   shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
   beijing: { name: "北京", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
@@ -390,7 +391,7 @@ function saveSearchHistory(address) {
 function getSearchHistory() {
   try {
     const saved = JSON.parse(localStorage.getItem(historyStorageKey()) || "[]");
-    return Array.isArray(saved) ? saved.filter((item) => typeof item === "string" && item.length > 0) : [];
+    return Array.isArray(saved) ? saved.filter((item) => typeof item === "string" && item.length > 0).slice(0, HISTORY_LIMIT) : [];
   } catch { return []; }
 }
 
@@ -398,7 +399,7 @@ function historyStorageKey() { return `public-facilities-search-history:${active
 
 function renderSearchHistory(history = getSearchHistory()) {
   searchHistory.hidden = history.length === 0;
-  historyItems.innerHTML = history.map((address) => `<button type="button" data-address="${escapeHtml(address)}">${escapeHtml(address)}</button>`).join("");
+  historyItems.innerHTML = history.slice(0, HISTORY_VISIBLE_LIMIT).map((address) => `<button type="button" data-address="${escapeHtml(address)}" title="${escapeHtml(address)}">${escapeHtml(address)}</button>`).join("");
 }
 
 function displayCategoryFor(category) {
