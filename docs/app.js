@@ -22,13 +22,13 @@ const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_LIMIT = 5;
 const CITIES = {
-  shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园" },
-  beijing: { name: "北京", geocodeName: "北京市", example: "天安门" },
-  hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖" },
-  guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔" },
-  shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园" },
-  suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园" },
-  hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园" },
+  shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
+  beijing: { name: "北京", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
+  hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
+  guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
+  shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
+  suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
+  hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
 };
 
 let facilities = [];
@@ -84,6 +84,11 @@ currentLocationButton.addEventListener("click", async () => {
   try {
     await catalogueReady;
     const origin = await getCurrentLocation();
+    const nearbyCity = selectNearbyCity(origin);
+    if (nearbyCity !== activeCity) {
+      switchCity(nearbyCity);
+      await catalogueReady;
+    }
     renderPlaces({ origin, groups: findNearestByCategory(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
@@ -209,12 +214,23 @@ function getCurrentLocation() {
         return;
       }
       resolve({
+        city: typeof result.addressComponent?.city === "string" ? result.addressComponent.city : "",
         formattedAddress: result.formattedAddress || "当前位置",
         latitude: Number(result.position.lat),
         longitude: Number(result.position.lng),
       });
     });
   }));
+}
+
+function selectNearbyCity(origin) {
+  const reportedCity = String(origin.city || "").replace(/市$/, "");
+  const exactCity = Object.entries(CITIES).find(([, city]) => city.name === reportedCity)?.[0];
+  if (exactCity) return exactCity;
+  const [nearestCity, distance] = Object.entries(CITIES)
+    .map(([city, config]) => [city, haversineMeters(origin, config.center)])
+    .sort(([, left], [, right]) => left - right)[0];
+  return distance <= 100_000 ? nearestCity : activeCity;
 }
 
 function loadAmap() {
