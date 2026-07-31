@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#10223c" />
+    <meta name="description" content="近邻的功能、城市覆盖范围与已发布公共设施数据量。" />
+    <title>功能介绍 | 近邻</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="about.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="返回近邻首页"><span class="brand-seal">近</span><span>近邻</span></a>
+      <nav class="topbar-links" aria-label="站点导航">
+        <a href="./">开始查询</a>
+        <a href="https://github.com/holynova/shanghai-public-facilities" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="main-content" class="about-main">
+      <section class="about-intro" aria-labelledby="about-title">
+        <p class="section-code">ABOUT / 01</p>
+        <h1 id="about-title">找到城市里离你最近的公共设施</h1>
+        <p>输入地址或使用当前位置，近邻会按类别计算直线距离，并列出每一类最近的三个地点。</p>
+      </section>
+
+      <section class="network-summary" aria-label="数据覆盖概览">
+        <div class="summary-cell"><strong id="city-total">9</strong><span>已覆盖城市</span></div>
+        <div class="summary-cell"><strong id="facility-total">加载中</strong><span>已发布地点</span></div>
+      </section>
+
+      <section class="about-section" aria-labelledby="city-data-title">
+        <div class="about-section-head">
+          <div>
+            <p class="section-code">DATA / 02</p>
+            <h2 id="city-data-title">各城市数据量</h2>
+          </div>
+          <p>实时读取已发布目录</p>
+        </div>
+        <ol id="city-board" class="city-board" aria-live="polite">
+          <li class="city-row is-loading"><span class="city-index">--</span><span class="city-name">正在读取城市数据</span><span class="city-count" aria-hidden="true"></span></li>
+        </ol>
+      </section>
+
+      <section class="about-section" aria-labelledby="features-title">
+        <p class="section-code">FEATURES / 03</p>
+        <h2 id="features-title">可以做什么</h2>
+        <ol class="feature-list">
+          <li><span class="feature-mark">01</span><div><h3>按地址查找</h3><p>通过高德地图解析地址坐标，再计算每个设施类别的最近结果。</p></div></li>
+          <li><span class="feature-mark">02</span><div><h3>使用当前位置</h3><p>允许定位后自动选择附近已支持的城市，不需要先手动切换。</p></div></li>
+          <li><span class="feature-mark">03</span><div><h3>按类别快速浏览</h3><p>文化艺术、交通、医疗、商业、公园和社区服务分别展示最近三处。</p></div></li>
+          <li><span class="feature-mark">04</span><div><h3>分享查询结果</h3><p>生成带项目链接和二维码的分享卡片，方便把当前查询发给别人。</p></div></li>
+        </ol>
+      </section>
+
+      <section class="about-section" aria-labelledby="scope-title">
+        <p class="section-code">SCOPE / 04</p>
+        <h2 id="scope-title">数据说明</h2>
+        <p class="data-scope">地点坐标采用 GCJ-02。距离为两点间直线距离，只适合初步比较，不代表实际步行或驾车路线。医院等级来自关键词候选，需要以卫健部门公布信息为准。</p>
+        <a class="about-action" href="./">开始查询附近设施</a>
+      </section>
+    </main>
+
+    <footer>近邻 · 城市公共设施近邻检索</footer>
+    <script src="about.js" defer></script>
+  </body>
+</html>

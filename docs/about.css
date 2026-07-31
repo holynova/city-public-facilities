@@ -1,0 +1,9 @@
+.about-intro h1 {
+  letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-row.is-loading .city-count {
+    animation: none;
+  }
+}
