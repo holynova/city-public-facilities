@@ -119,13 +119,14 @@ export class AmapClient {
     pathname: string,
     params: URLSearchParams,
   ): Promise<T> {
-    for (let attempt = 0; attempt < 4; attempt += 1) {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
       try {
         return await this.requestOnce<T>(pathname, params);
       } catch (error) {
-        const canRetry = error instanceof AmapApiError
-          && error.infoCode === "CUQPS_HAS_EXCEEDED_THE_LIMIT"
-          && attempt < 3;
+        const canRetry = attempt < 4 && (
+          error instanceof TypeError
+          || (error instanceof AmapApiError && ["CUQPS_HAS_EXCEEDED_THE_LIMIT", "SERVER_IS_BUSY"].includes(error.infoCode ?? ""))
+        );
         if (!canRetry) throw error;
         await new Promise<void>((resolve) => setTimeout(resolve, 2_000 * (attempt + 1)));
       }

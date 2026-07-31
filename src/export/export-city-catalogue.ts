@@ -68,6 +68,12 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "nanjing" && record.category === "landmark.city_landmark") {
     return ["中山陵", "中山陵景区", "夫子庙", "总统府", "总统府景区", "南京总统府", "南京总统府景区", "明孝陵", "明孝陵景区", "玄武湖"].includes(record.name);
   }
+  if (citySlug === "chengdu" && record.category === "transport.airport") {
+    return ["成都双流国际机场", "成都天府国际机场"].includes(record.name);
+  }
+  if (citySlug === "chengdu" && record.category === "landmark.city_landmark") {
+    return ["天府广场", "成都大熊猫繁育研究基地", "武侯祠", "成都武侯祠", "成都武侯祠博物馆", "杜甫草堂", "成都杜甫草堂", "成都杜甫草堂博物馆", "宽窄巷子", "宽窄巷子景区", "春熙路"].includes(record.name);
+  }
   return true;
 }
 function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {

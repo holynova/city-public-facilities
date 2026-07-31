@@ -263,7 +263,43 @@ const NANJING_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
-const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES };
+const CHENGDU_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|书屋|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "音乐厅", allPages: true, accepts: named(/音乐厅|音乐堂|大剧院|剧院|演艺中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.big_box_retail", keywords: "山姆会员商店", accepts: typedNamed("06", /山姆会员商店/) },
+  { category: "commerce.big_box_retail", keywords: "麦德龙", accepts: typedNamed("06", /麦德龙/) },
+  { category: "commerce.big_box_retail", keywords: "宜家家居", accepts: typedNamed("06", /宜家/) },
+  { category: "commerce.big_box_retail", keywords: "开市客", accepts: typedNamed("06", /开市客|Costco/i) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|万象|太古里|IFS|大悦城|龙湖|银泰|来福士/) },
+  { category: "transport.railway_station", keywords: "成都东站", accepts: typedNamed("150200", /^成都东站$/) },
+  { category: "transport.railway_station", keywords: "成都南站", accepts: typedNamed("150200", /^成都南站$/) },
+  { category: "transport.railway_station", keywords: "成都西站", accepts: typedNamed("150200", /^成都西站$/) },
+  { category: "transport.railway_station", keywords: "双流机场站", accepts: typedNamed("150200", /^双流机场站$/) },
+  { category: "transport.railway_station", keywords: "天府机场站", accepts: typedNamed("150200", /^天府机场站$/) },
+  { category: "transport.airport", keywords: "成都双流国际机场", accepts: typedNamed("150104", /成都双流国际机场/) },
+  { category: "transport.airport", keywords: "成都天府国际机场", accepts: typedNamed("150104", /成都天府国际机场/) },
+  { category: "landmark.city_landmark", keywords: "天府广场", accepts: named(/^天府广场$/) },
+  { category: "landmark.city_landmark", keywords: "成都大熊猫繁育研究基地", accepts: named(/^成都大熊猫繁育研究基地$/) },
+  { category: "landmark.city_landmark", keywords: "武侯祠", accepts: named(/^(成都)?武侯祠(博物馆)?$/) },
+  { category: "landmark.city_landmark", keywords: "杜甫草堂", accepts: named(/杜甫草堂/) },
+  { category: "landmark.city_landmark", keywords: "宽窄巷子", accepts: named(/^宽窄巷子(景区)?$/) },
+  { category: "landmark.city_landmark", keywords: "春熙路", accepts: named(/^春熙路$/) },
+  { category: "park.major_city_park", keywords: "成都人民公园", accepts: typedNamed("11", /^(成都)?人民公园$/) },
+  { category: "park.major_city_park", keywords: "桂溪生态公园", accepts: typedNamed("11", /^桂溪生态公园$/) },
+  { category: "park.major_city_park", keywords: "青龙湖湿地公园", accepts: typedNamed("11", /^青龙湖湿地公园$/) },
+  { category: "park.major_city_park", keywords: "成都植物园", accepts: typedNamed("11", /^成都植物园$/) },
+  { category: "park.major_city_park", keywords: "天府公园", accepts: typedNamed("11", /^天府公园$/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
+const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES };
 
 export async function collectCityCatalogue(snapshot: string, city = "北京市"): Promise<AmapCollectedFacilityRecord[]> {
   const queries = CITY_QUERIES[city];
