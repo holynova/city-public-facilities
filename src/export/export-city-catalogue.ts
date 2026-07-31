@@ -64,6 +64,10 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "hefei" && record.category === "landmark.city_landmark") {
     return ["包公园", "逍遥津公园", "李鸿章故居", "三河古镇", "安徽博物院", "天鹅湖"].includes(record.name);
   }
+  if (citySlug === "nanjing" && record.category === "transport.airport") return record.name === "南京禄口国际机场";
+  if (citySlug === "nanjing" && record.category === "landmark.city_landmark") {
+    return ["中山陵", "中山陵景区", "夫子庙", "总统府", "总统府景区", "南京总统府", "南京总统府景区", "明孝陵", "明孝陵景区", "玄武湖"].includes(record.name);
+  }
   return true;
 }
 function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {

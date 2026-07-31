@@ -30,6 +30,7 @@ const CITIES = {
   shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
   suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
   hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
+  nanjing: { name: "南京", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
 };
 
 let facilities = [];

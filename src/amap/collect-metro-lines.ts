@@ -40,7 +40,44 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 5 }, (_, index) => `地铁${index + 1}号线`), "地铁8号线", "S1线"],
     outputFile: "amap-metro-lines.json",
   },
+  "南京市": {
+    cityCode: "025",
+    lineQueries: [
+      "地铁1号线",
+      "地铁2号线",
+      "地铁3号线",
+      "地铁4号线",
+      "地铁5号线",
+      "地铁7号线",
+      "地铁10号线",
+      "地铁S1号线",
+      "地铁S2号线",
+      "地铁S3号线",
+      "地铁S6号线",
+      "地铁S7号线",
+      "地铁S8号线",
+      "地铁S9号线",
+    ],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
+
+const NANJING_OPERATING_LINES = new Set([
+  "地铁1号线",
+  "地铁2号线",
+  "地铁3号线",
+  "地铁4号线",
+  "地铁5号线",
+  "地铁7号线",
+  "地铁10号线",
+  "地铁S1号线",
+  "地铁S2号线",
+  "地铁S3号线",
+  "地铁S6号线",
+  "地铁S7号线",
+  "地铁S8号线",
+  "地铁S9号线",
+]);
 
 export async function collectMetroFromLines(snapshot: string, city = "上海市"): Promise<AmapCollectedFacilityRecord[]> {
   const config = CITY_RAIL_CONFIG[city as keyof typeof CITY_RAIL_CONFIG];
@@ -53,6 +90,7 @@ export async function collectMetroFromLines(snapshot: string, city = "上海市"
       if (!isCityRailLine(line, config.cityCode)) continue;
       if (city === "广州市" && /^佛山地铁/.test(line.name)) continue;
       const canonical = line.name.replace(/\(.*/, "");
+      if (city === "南京市" && !NANJING_OPERATING_LINES.has(canonical)) continue;
       if (!lines.has(canonical)) lines.set(canonical, line);
     }
   }
