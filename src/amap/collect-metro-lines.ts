@@ -65,6 +65,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 10 }, (_, index) => `地铁${index + 1}号线`), "地铁13号线", "地铁17号线", "地铁18号线", "地铁19号线", "地铁27号线", "地铁30号线", "蓉2号线", "资阳线"],
     outputFile: "amap-metro-lines.json",
   },
+  "芜湖市": {
+    cityCode: "0553",
+    lineQueries: ["轨道交通1号线", "轨道交通2号线", "芜湖轨道交通1号线", "芜湖轨道交通2号线"],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
 
 const NANJING_OPERATING_LINES = new Set([

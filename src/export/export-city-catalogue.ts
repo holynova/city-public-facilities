@@ -39,6 +39,13 @@ function toExport(record: AmapCollectedFacilityRecord): ExportRecord {
 }
 
 function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
+  if (citySlug === "wuhu" && record.category === "transport.airport") return record.name === "芜湖宣州机场";
+  if (citySlug === "wuhu" && record.category === "hospital.secondary_a") {
+    return /医院$/.test(record.name) && !/妇产科|体检科|住院部/.test(record.name);
+  }
+  if (citySlug === "wuhu" && record.category === "landmark.city_landmark") {
+    return ["鸠兹古镇", "芜湖古城", "芜湖方特乐园", "芜湖方特梦幻王国", "芜湖方特东方神画", "芜湖方特水上乐园", "中山路步行街", "广济寺", "天门山景区", "天门山公园"].includes(record.name);
+  }
   if (citySlug === "beijing" && record.category === "landmark.city_landmark" && record.searchEvidence.includes("国贸CBD")) return false;
   if (citySlug === "beijing" && record.category === "transport.airport") return ["北京首都国际机场", "北京大兴国际机场"].includes(record.name);
   if (citySlug === "beijing" && record.category === "landmark.city_landmark") {

@@ -8,6 +8,7 @@ const CITIES = [
   ["hefei", "合肥"],
   ["nanjing", "南京"],
   ["chengdu", "成都"],
+  ["wuhu", "芜湖"],
 ];
 
 const cityBoard = document.querySelector("#city-board");

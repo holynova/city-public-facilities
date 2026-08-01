@@ -299,7 +299,40 @@ const CHENGDU_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
-const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES };
+const WUHU_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|书屋|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "音乐厅", allPages: true, accepts: named(/音乐厅|音乐堂|大剧院|剧院|演艺中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.big_box_retail", keywords: "山姆会员商店", accepts: typedNamed("06", /山姆会员商店/) },
+  { category: "commerce.big_box_retail", keywords: "麦德龙", accepts: typedNamed("06", /麦德龙/) },
+  { category: "commerce.big_box_retail", keywords: "宜家家居", accepts: typedNamed("06", /宜家/) },
+  { category: "commerce.big_box_retail", keywords: "开市客", accepts: typedNamed("06", /开市客|Costco/i) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|万象|万达|吾悦|八佰伴|苏宁|星立方|金鹰|大悦城/) },
+  { category: "transport.railway_station", keywords: "芜湖站", accepts: typedNamed("150200", /^芜湖站$/) },
+  { category: "transport.railway_station", keywords: "芜湖北站", accepts: typedNamed("150200", /^芜湖北站$/) },
+  { category: "transport.railway_station", keywords: "芜湖南站", accepts: typedNamed("150200", /^芜湖南站$/) },
+  { category: "transport.airport", keywords: "芜湖宣州机场", accepts: typedNamed("150104", /芜湖宣州机场/) },
+  { category: "landmark.city_landmark", keywords: "鸠兹古镇", accepts: named(/鸠兹古镇/) },
+  { category: "landmark.city_landmark", keywords: "芜湖古城", accepts: named(/芜湖古城/) },
+  { category: "landmark.city_landmark", keywords: "芜湖方特", accepts: named(/芜湖方特/) },
+  { category: "landmark.city_landmark", keywords: "中山路步行街", accepts: named(/中山路步行街/) },
+  { category: "landmark.city_landmark", keywords: "广济寺", accepts: named(/^广济寺$/) },
+  { category: "landmark.city_landmark", keywords: "天门山景区", accepts: named(/天门山/) },
+  { category: "park.major_city_park", keywords: "镜湖公园", accepts: typedNamed("11", /镜湖公园/) },
+  { category: "park.major_city_park", keywords: "赭山公园", accepts: typedNamed("11", /赭山公园/) },
+  { category: "park.major_city_park", keywords: "汀棠公园", accepts: typedNamed("11", /汀棠公园/) },
+  { category: "park.major_city_park", keywords: "神山公园", accepts: typedNamed("11", /神山公园/) },
+  { category: "park.major_city_park", keywords: "雕塑公园", accepts: typedNamed("11", /雕塑公园/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
+const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES };
 
 export async function collectCityCatalogue(snapshot: string, city = "北京市"): Promise<AmapCollectedFacilityRecord[]> {
   const queries = CITY_QUERIES[city];
