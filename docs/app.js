@@ -37,6 +37,16 @@ const CITIES = {
   wuhu: { name: "芜湖", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
   zhuhai: { name: "珠海", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
 };
+const MAJOR_GROUPS = [
+  { key: "education", label: "教育", shortLabel: "教育", color: "#5857a6", categories: ["education.university", "education.school", "education.kindergarten"] },
+  { key: "transport", label: "交通", shortLabel: "交通", color: "#009a74", categories: ["transit.metro_station", "transport.railway_station", "transport.airport"] },
+  { key: "culture", label: "文化艺术", shortLabel: "文化艺术", color: "#ce3347", categories: ["library.all", "culture.museum", "culture.art_gallery", "culture.concert_hall"] },
+  { key: "health", label: "医疗健康", shortLabel: "医疗健康", color: "#bd2d45", categories: ["medical.tertiary_a", "medical.other"] },
+  { key: "environment", label: "环境休闲", shortLabel: "环境休闲", color: "#23834d", categories: ["park.major_city_park", "park.neighborhood_park"] },
+  { key: "commerce", label: "商业购物", shortLabel: "商业购物", color: "#de6a18", categories: ["commerce.big_box_retail", "commerce.large_mall"] },
+  { key: "public-service", label: "公共服务", shortLabel: "公共服务", color: "#00888f", categories: ["community.civic_service_center"] },
+  { key: "landmark", label: "城市地标", shortLabel: "城市地标", color: "#715bba", categories: ["landmark.city_landmark"] },
+];
 
 let facilities = [];
 let amapReady;
@@ -61,7 +71,7 @@ function loadCatalogue(city) {
     facilities = catalogue.facilities ?? [];
     if (facilities.length === 0) throw new Error("地点目录为空。");
     status.textContent = `已加载 ${facilities.length.toLocaleString("zh-CN")} 处${cityConfig.name}地点`;
-    resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>每个类别显示最近三处地点。</p>";
+    resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>按大组整理结果，每个细分类别显示最近三处地点。</p>";
   })
   .catch((error) => renderMessage(error instanceof Error ? error.message : "地点目录加载失败。", "error"));
 }
@@ -96,7 +106,7 @@ currentLocationButton.addEventListener("click", async () => {
       switchCity(nearbyCity);
       await catalogueReady;
     }
-    renderPlaces({ origin, groups: findNearestByCategory(facilities, origin) });
+    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
   } finally {
@@ -106,9 +116,16 @@ currentLocationButton.addEventListener("click", async () => {
 });
 
 categoryNav.addEventListener("click", (event) => {
-  const target = event.target.closest("button[data-target]");
+  const target = event.target.closest("button[data-filter]");
   if (!target) return;
-  document.querySelector(`#${target.dataset.target}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const filter = target.dataset.filter;
+  categoryNav.querySelectorAll("button[data-filter]").forEach((item) => {
+    item.setAttribute("aria-pressed", String(item === target));
+  });
+  resultContent.querySelectorAll(".major-group").forEach((group) => {
+    group.hidden = filter !== "all" && group.dataset.group !== filter;
+  });
+  if (filter !== "all") document.querySelector(`#major-${filter}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 shareButton.addEventListener("click", openShareDialog);
@@ -161,7 +178,7 @@ async function searchNearby(address) {
     await catalogueReady;
     const origin = await geocodeAddress(address);
     saveSearchHistory(address);
-    renderPlaces({ origin, groups: findNearestByCategory(facilities, origin) });
+    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "查询失败，请稍后重试。", "error");
   } finally {
@@ -174,7 +191,7 @@ function setLoading(loading) {
   button.disabled = loading;
   button.setAttribute("aria-label", loading ? "正在定位" : "开始查询");
   if (loading) {
-    status.textContent = "正在定位并计算各类别最近地点";
+    status.textContent = "正在定位并计算各分组最近地点";
     categoryNav.hidden = true;
     shareButton.hidden = true;
     resultContent.className = "loading-state";
@@ -310,6 +327,14 @@ function findNearestByCategory(catalogue, origin) {
     });
 }
 
+function findNearestByMajorGroup(catalogue, origin) {
+  const categoryGroups = new Map(findNearestByCategory(catalogue, origin).map((group) => [group.category, group]));
+  return MAJOR_GROUPS.map((major) => {
+    const subgroups = major.categories.map((category) => categoryGroups.get(category)).filter(Boolean);
+    return { ...major, subgroups };
+  }).filter((major) => major.subgroups.length > 0);
+}
+
 function nearestDistance(origin, place) {
   const locations = place.sourceLocations ?? place.stationLocations ?? [place];
   return Math.round(Math.min(...locations.map((location) => haversineMeters(origin, location))));
@@ -325,20 +350,26 @@ function haversineMeters(first, second) {
 }
 
 function renderPlaces(payload) {
-  const { origin, groups } = payload;
-  latestShare = { address: origin.formattedAddress, groups };
+  const { origin, majorGroups } = payload;
+  const groups = majorGroups.flatMap((major) => major.subgroups.map((group) => ({ ...group, majorKey: major.key, majorLabel: major.label })));
+  latestShare = { address: origin.formattedAddress, majorGroups, groups };
   status.textContent = origin.formattedAddress;
   shareButton.hidden = false;
   categoryNav.hidden = false;
-  categoryNav.innerHTML = groups.map((group) => {
-    const meta = categoryMeta(group.category);
-    return `<button type="button" data-target="${groupId(group.category)}" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}" title="${escapeHtml(meta.label)}"><i></i><span>${escapeHtml(meta.shortLabel)}</span></button>`;
-  }).join("");
+  categoryNav.innerHTML = [
+    `<button type="button" data-filter="all" aria-pressed="true" title="显示全部分组"><span>全部</span><b>${majorGroups.length}</b></button>`,
+    ...majorGroups.map((major) => `<button type="button" data-filter="${major.key}" style="--route:${major.color}" aria-pressed="false" aria-label="筛选${escapeHtml(major.label)}" title="筛选${escapeHtml(major.label)}"><span>${escapeHtml(major.shortLabel)}</span><b>${major.subgroups.length}</b></button>`),
+  ].join("");
   resultContent.className = "place-list";
-  resultContent.innerHTML = groups.map((group) => {
-    const meta = categoryMeta(group.category);
-    return `<section class="category-group" id="${groupId(group.category)}" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p></header>${group.places.map((place) => `<article class="place"><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}</section>`;
+  resultContent.innerHTML = majorGroups.map((major) => {
+    const count = major.subgroups.reduce((total, group) => total + group.places.length, 0);
+    return `<section class="major-group" id="${majorGroupId(major.key)}" data-group="${major.key}" style="--route:${major.color}" aria-label="${escapeHtml(major.label)}"><header class="major-heading"><div><p>结果分组</p><h3>${escapeHtml(major.label)}</h3></div><strong>${count} 个结果</strong></header>${major.subgroups.map((group) => renderSubgroup(group)).join("")}</section>`;
   }).join("");
+}
+
+function renderSubgroup(group) {
+  const meta = categoryMeta(group.category);
+  return `<section class="category-group subgroup" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p><span>${group.places.length} 处</span></header>${group.places.map((place) => `<article class="place"><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}</section>`;
 }
 
 function projectUrl() {
@@ -348,7 +379,7 @@ function projectUrl() {
 }
 
 function shareText() {
-  return `${latestShare.address}附近公共设施结果。`;
+  return `${latestShare.address}附近公共设施结果，共${latestShare.majorGroups.length}个分组。`;
 }
 
 function openShareDialog() {
@@ -498,7 +529,8 @@ function drawShareHeader(context, share, options) {
   drawTrimmedText(context, share.address, margin, headerHeight - 104, textMaxWidth);
   context.fillStyle = "#b9c4cb";
   context.font = `400 ${metaSize}px "Noto Sans SC", sans-serif`;
-  context.fillText(`${share.groups.length} 个类别 · 每类最多 3 个结果 · 直线距离`, margin, headerHeight - 58);
+  const majorCount = share.majorGroups?.length ?? share.groups.length;
+  context.fillText(`${majorCount} 个分组 · ${share.groups.length} 个细分类别 · 每类最多 3 个结果 · 直线距离`, margin, headerHeight - 58);
   if (qrImage) {
     const frameX = width - margin - qrFrame;
     context.fillStyle = "#ffffff";
@@ -535,7 +567,7 @@ function drawShareTile(context, group, x, y, width, height, style) {
   context.fillRect(x, y, width, 8);
   context.fillStyle = "#18252c";
   context.font = `700 ${style.headingSize}px "Noto Sans SC", sans-serif`;
-  context.fillText(meta.label, x + style.tilePadding, y + 44);
+  drawTrimmedText(context, group.majorLabel ? `${group.majorLabel} · ${meta.label}` : meta.label, x + style.tilePadding, y + 44, width - style.tilePadding * 2 - 110);
   context.fillStyle = "#61707a";
   context.font = `400 ${style.countSize}px "Noto Sans SC", sans-serif`;
   context.textAlign = "right";
@@ -680,7 +712,7 @@ function categoryMeta(category) {
 
 function formatDistance(meters) { return meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`; }
 function formatCoordinate(latitude, longitude) { return `${latitude.toFixed(5)}°N, ${longitude.toFixed(5)}°E`; }
-function groupId(category) { return `route-${category.replaceAll(".", "-")}`; }
+function majorGroupId(key) { return `major-${key}`; }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character])); }
 
 applyCityUi(activeCity);

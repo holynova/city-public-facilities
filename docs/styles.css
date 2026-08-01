@@ -18,3 +18,17 @@ html,body { overflow-x:clip; }
 @keyframes scan { 50% { opacity:.55; } } @keyframes spin { to { transform:rotate(360deg); } } @media (min-width:720px) { :root { --content-width:680px; }.topbar { padding-left:calc((100% - var(--content-width)) / 2); padding-right:calc((100% - var(--content-width)) / 2); } main,footer { width:var(--content-width); max-width:100%; margin-inline:auto; } main { min-height:calc(100vh - 50px); } } @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; }.loading-state span,.input-row button:disabled svg { animation:none; } }
 .share-actions #save-image,.share-actions #save-image-mobile { min-height:46px; }
 .share-primary:disabled { cursor:wait; opacity:.62; }
+.category-nav button[aria-pressed="true"] { border-color:var(--route, var(--teal)); color:#fff; background:var(--route, var(--teal)); }
+.category-nav button[data-filter="all"][aria-pressed="true"] { border-color:var(--navy); background:var(--navy); }
+.category-nav button b { display:inline-block; margin-left:3px; color:inherit; font-size:10px; font-weight:800; }
+.major-group { scroll-margin-top:108px; margin:0; border-bottom:1px solid var(--line); }
+.major-heading { display:flex; align-items:center; justify-content:space-between; min-height:54px; padding:8px 18px; border-bottom:1px solid var(--line); background:#eef0ed; }
+.major-heading p { margin:0 0 2px; color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.08em; }
+.major-heading h3 { margin:0; color:var(--ink); font-size:19px; line-height:1.2; }
+.major-heading strong { color:var(--route); font-size:12px; font-weight:800; }
+.major-group .category-group.subgroup { margin:0; padding:0 18px; border-bottom:0; }
+.major-group .subgroup + .subgroup { border-top:1px solid #dddeda; }
+.subgroup .category-heading { min-height:31px; }
+.subgroup .category-heading p { color:var(--muted); font-size:12px; font-weight:700; }
+.subgroup .category-heading p::before { width:7px; height:7px; margin-right:6px; }
+.subgroup .category-heading span { margin-left:auto; color:var(--muted); font-size:10px; }
