@@ -16,6 +16,7 @@ const shareDialog = document.querySelector("#share-dialog");
 const shareCloseButton = document.querySelector("#share-close");
 const nativeShareButton = document.querySelector("#native-share");
 const copyShareButton = document.querySelector("#copy-share");
+const saveImageButton = document.querySelector("#save-image");
 const shareAddress = document.querySelector("#share-address");
 const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
@@ -115,6 +116,7 @@ shareDialog.addEventListener("click", (event) => {
 });
 nativeShareButton.addEventListener("click", shareCurrentResult);
 copyShareButton.addEventListener("click", copyProjectLink);
+saveImageButton.addEventListener("click", saveResultImage);
 
 function initialCity() {
   const value = new URLSearchParams(window.location.search).get("city");
@@ -320,7 +322,7 @@ function haversineMeters(first, second) {
 
 function renderPlaces(payload) {
   const { origin, groups } = payload;
-  latestShare = { address: origin.formattedAddress };
+  latestShare = { address: origin.formattedAddress, groups };
   status.textContent = origin.formattedAddress;
   shareButton.hidden = false;
   categoryNav.hidden = false;
@@ -351,9 +353,177 @@ function openShareDialog() {
   shareAddress.textContent = latestShare.address;
   shareLink.href = url;
   shareLink.textContent = url.replace(/^https?:\/\//, "");
+  shareQr.crossOrigin = "anonymous";
   shareQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(url)}`;
   shareFeedback.textContent = "";
   shareDialog.showModal();
+}
+
+async function saveResultImage() {
+  if (!latestShare?.groups?.length) return;
+  saveImageButton.disabled = true;
+  shareFeedback.textContent = "正在生成结果长图…";
+  try {
+    const blob = await createShareImage(latestShare);
+    const filename = `近邻-${CITIES[activeCity].name}-结果.png`;
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    shareFeedback.textContent = "长图已下载。";
+  } catch (error) {
+    if (error?.name !== "AbortError") shareFeedback.textContent = "长图生成失败，请稍后重试。";
+  } finally {
+    saveImageButton.disabled = false;
+  }
+}
+
+async function createShareImage(share) {
+  const width = 1080;
+  const margin = 48;
+  const gap = 24;
+  const tileWidth = (width - margin * 2 - gap) / 2;
+  const tileHeight = 224;
+  const rows = Math.ceil(share.groups.length / 2);
+  const headerHeight = 224;
+  const footerHeight = 116;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = headerHeight + rows * (tileHeight + gap) - gap + footerHeight;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Canvas is unavailable.");
+  context.fillStyle = "#f7f5ef";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.fillStyle = "#10223c";
+  context.fillRect(0, 0, width, headerHeight);
+  context.fillStyle = "#e94335";
+  context.fillRect(margin, 38, 58, 58);
+  context.fillStyle = "#ffffff";
+  context.font = '700 34px "Noto Sans SC", sans-serif';
+  context.textAlign = "center";
+  context.fillText("近", margin + 29, 78);
+  context.textAlign = "left";
+  context.font = '700 32px "Noto Sans SC", sans-serif';
+  context.fillText(`${CITIES[activeCity].name}公共设施近邻`, margin + 78, 72);
+  context.font = '500 24px "Noto Sans SC", sans-serif';
+  drawTrimmedText(context, share.address, margin, 132, width - margin * 2 - 180);
+  context.fillStyle = "#b9c4cb";
+  context.font = '400 19px "Noto Sans SC", sans-serif';
+  context.fillText(`${share.groups.length} 个类别 · 每类最多 3 个结果 · 直线距离`, margin, 178);
+
+  const qrImage = await Promise.race([
+    loadShareQrImage(projectUrl()),
+    new Promise((resolve) => window.setTimeout(() => resolve(null), 1800)),
+  ]);
+  if (qrImage) {
+    context.fillStyle = "#ffffff";
+    context.fillRect(width - margin - 148, 36, 148, 148);
+    context.drawImage(qrImage, width - margin - 140, 44, 132, 132);
+  }
+
+  context.textAlign = "left";
+  share.groups.forEach((group, index) => {
+    const column = index % 2;
+    const row = Math.floor(index / 2);
+    const x = margin + column * (tileWidth + gap);
+    const y = headerHeight + row * (tileHeight + gap);
+    drawShareTile(context, group, x, y, tileWidth, tileHeight);
+  });
+
+  const footerY = canvas.height - footerHeight;
+  context.strokeStyle = "#cdd0cf";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(margin, footerY + 8);
+  context.lineTo(width - margin, footerY + 8);
+  context.stroke();
+  context.fillStyle = "#61707a";
+  context.font = '400 19px "Noto Sans SC", sans-serif';
+  context.fillText("打开项目查看实时查询", margin, footerY + 50);
+  context.fillStyle = "#10223c";
+  context.font = '600 19px "Noto Sans SC", sans-serif';
+  drawTrimmedText(context, projectUrl(), margin, footerY + 83, width - margin * 2);
+  return canvasToBlob(canvas);
+}
+
+function drawShareTile(context, group, x, y, width, height) {
+  const meta = categoryMeta(group.category);
+  context.fillStyle = "#ffffff";
+  context.fillRect(x, y, width, height);
+  context.fillStyle = meta.color;
+  context.fillRect(x, y, 10, height);
+  context.fillStyle = "#18252c";
+  context.font = '700 23px "Noto Sans SC", sans-serif';
+  context.fillText(meta.label, x + 28, y + 37);
+  context.fillStyle = "#61707a";
+  context.font = '400 17px "Noto Sans SC", sans-serif';
+  context.textAlign = "right";
+  context.fillText(`${group.places.length} 个`, x + width - 22, y + 37);
+  context.textAlign = "left";
+  group.places.forEach((place, index) => {
+    const rowY = y + 58 + index * 52;
+    context.strokeStyle = "#e2e3df";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(x + 28, rowY - 13);
+    context.lineTo(x + width - 22, rowY - 13);
+    context.stroke();
+    context.fillStyle = "#7a858b";
+    context.font = '600 16px system-ui, sans-serif';
+    context.fillText(String(index + 1).padStart(2, "0"), x + 28, rowY + 7);
+    context.fillStyle = "#18252c";
+    context.font = '600 19px "Noto Sans SC", sans-serif';
+    drawTrimmedText(context, place.name, x + 68, rowY + 5, width - 190);
+    context.fillStyle = meta.color;
+    context.font = '700 18px system-ui, sans-serif';
+    context.textAlign = "right";
+    context.fillText(formatDistance(place.distanceMeters), x + width - 22, rowY + 5);
+    context.textAlign = "left";
+    context.fillStyle = "#61707a";
+    context.font = '400 15px "Noto Sans SC", sans-serif';
+    const detail = [place.district, place.address].filter(Boolean).join(" · ");
+    drawTrimmedText(context, detail || "地址待补充", x + 68, rowY + 27, width - 96);
+  });
+}
+
+function drawTrimmedText(context, text, x, y, maxWidth) {
+  let value = String(text || "");
+  while (value.length > 1 && context.measureText(value).width > maxWidth) value = `${value.slice(0, -2)}…`;
+  context.fillText(value, x, y);
+}
+
+function loadShareQrImage(url) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 4500);
+  return fetch(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(url)}`, { mode: "cors", signal: controller.signal })
+    .then((response) => {
+      if (!response.ok) throw new Error("QR request failed");
+      return response.blob();
+    })
+    .then((blob) => new Promise((resolve, reject) => {
+      const image = new Image();
+      const objectUrl = URL.createObjectURL(blob);
+      const imageTimeout = window.setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("QR image timeout"));
+      }, 1500);
+      image.onload = () => { window.clearTimeout(imageTimeout); URL.revokeObjectURL(objectUrl); resolve(image); };
+      image.onerror = () => { window.clearTimeout(imageTimeout); URL.revokeObjectURL(objectUrl); reject(new Error("QR image failed")); };
+      image.src = objectUrl;
+    }))
+    .catch(() => null)
+    .finally(() => window.clearTimeout(timeout));
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Image export failed")), "image/png");
+  });
 }
 
 async function shareCurrentResult() {
