@@ -288,12 +288,20 @@ function findNearestByCategory(catalogue, origin) {
   }
   return [...groups.entries()]
     .sort(([left], [right]) => categorySortOrder(left) - categorySortOrder(right))
-    .map(([category, items]) => ({
-      category,
-      places: items.map((place) => ({ ...place, distanceMeters: nearestDistance(origin, place) }))
-        .sort((left, right) => left.distanceMeters - right.distanceMeters)
-        .slice(0, 3),
-    }));
+    .map(([category, items]) => {
+      const ranked = items.map((place) => ({ ...place, distanceMeters: nearestDistance(origin, place) }))
+        .sort((left, right) => left.distanceMeters - right.distanceMeters);
+      const seenNames = new Set();
+      const unique = category === "education.university"
+        ? ranked.filter((place) => {
+          const key = place.name.replace(/[（）()\s·]/g, "").toLowerCase();
+          if (seenNames.has(key)) return false;
+          seenNames.add(key);
+          return true;
+        })
+        : ranked;
+      return { category, places: unique.slice(0, 3) };
+    });
 }
 
 function nearestDistance(origin, place) {
@@ -412,11 +420,12 @@ function displayCategoryFor(category) {
 }
 
 function categorySortOrder(category) {
-  return ["transit.metro_station", "transport.railway_station", "transport.airport", "medical.tertiary_a", "medical.other", "community.civic_service_center", "library.all", "culture.museum", "culture.art_gallery", "culture.concert_hall", "park.major_city_park", "park.neighborhood_park", "commerce.big_box_retail", "commerce.large_mall", "landmark.city_landmark"].indexOf(category);
+  return ["transit.metro_station", "transport.railway_station", "transport.airport", "medical.tertiary_a", "medical.other", "education.university", "community.civic_service_center", "library.all", "culture.museum", "culture.art_gallery", "culture.concert_hall", "park.major_city_park", "park.neighborhood_park", "commerce.big_box_retail", "commerce.large_mall", "landmark.city_landmark"].indexOf(category);
 }
 
 function categoryMeta(category) {
   const categories = {
+    "education.university": { label: "大学", shortLabel: "大学", color: "#5857a6" },
     "culture.art_gallery": { label: "美术馆", shortLabel: "美术馆", color: "#e54b3f" }, "culture.concert_hall": { label: "音乐厅", shortLabel: "音乐厅", color: "#9a4f9e" }, "culture.museum": { label: "博物馆", shortLabel: "博物馆", color: "#ce3347" }, "commerce.big_box_retail": { label: "大型仓储零售", shortLabel: "仓储零售", color: "#c78c00" }, "commerce.large_mall": { label: "大型商场", shortLabel: "大型商场", color: "#de6a18" }, "community.civic_service_center": { label: "社区文化与党群服务中心", shortLabel: "社区中心", color: "#00888f" }, "landmark.city_landmark": { label: "城市地标", shortLabel: "城市地标", color: "#715bba" }, "library.all": { label: "图书馆", shortLabel: "图书馆", color: "#3474b9" }, "medical.tertiary_a": { label: "三级甲等医院", shortLabel: "三甲医院", color: "#bd2d45" }, "medical.other": { label: "其他医疗机构", shortLabel: "其他医疗", color: "#de6a79" }, "park.major_city_park": { label: "大型市级公园", shortLabel: "市级公园", color: "#23834d" }, "park.neighborhood_park": { label: "街区与口袋公园", shortLabel: "口袋公园", color: "#68a52b" }, "transit.metro_station": { label: "地铁站", shortLabel: "地铁站", color: "#009a74" }, "transport.airport": { label: "机场", shortLabel: "机场", color: "#3c87b9" }, "transport.railway_station": { label: "火车站", shortLabel: "火车站", color: "#df831e" },
   };
   return categories[category] || { label: category, shortLabel: category, color: "#617077" };

@@ -196,8 +196,22 @@ export function findNearestFacilitiesByCategory(
     .sort(([left], [right]) => categorySortOrder(left) - categorySortOrder(right))
     .map(([category, categoryFacilities]) => ({
       category,
-      places: findNearestFacilities(categoryFacilities, origin, limitPerCategory),
+      places: uniqueNearestFacilities(
+        findNearestFacilities(categoryFacilities, origin, categoryFacilities.length),
+        category,
+      ).slice(0, limitPerCategory),
     }));
+}
+
+function uniqueNearestFacilities(facilities: NearbyFacility[], category: string): NearbyFacility[] {
+  if (category !== "education.university") return facilities;
+  const seenNames = new Set<string>();
+  return facilities.filter((facility) => {
+    const key = facility.name.replace(/[（）()\s·]/g, "").toLowerCase();
+    if (seenNames.has(key)) return false;
+    seenNames.add(key);
+    return true;
+  });
 }
 
 function displayCategoryFor(sourceCategory: string): string {
@@ -215,6 +229,7 @@ function categorySortOrder(category: string): number {
     "culture.art_gallery",
     "culture.concert_hall",
     "library.all",
+    "education.university",
     "community.civic_service_center",
     "transit.metro_station",
     "transport.railway_station",

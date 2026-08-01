@@ -5,16 +5,18 @@ import { collectAmapFacilities, validAmapCollectionProfiles } from "./amap/colle
 import { enrichOfficialHospitals } from "./amap/enrich-official-hospitals.js";
 import { collectMetroFromLines } from "./amap/collect-metro-lines.js";
 import { collectCityCatalogue } from "./amap/collect-city-catalogue.js";
+import { collectUniversities } from "./amap/collect-universities.js";
 import { fetchCultureSources } from "./sources/culture.js";
 import { normalizeCultureSources } from "./sources/normalize-culture.js";
 import { normalizeMedicalInstitutionImport } from "./sources/normalize-medical-institution-import.js";
 import { exportAllFacilities } from "./export/export-all.js";
 import { exportCityCatalogue } from "./export/export-city-catalogue.js";
+import { mergeUniversitiesIntoWebCatalogue } from "./export/merge-universities.js";
 
 const command = process.argv[2] ?? "help";
 
 function printHelp(): void {
-  console.log(`Shanghai Public Facilities Collector\n\nCommands:\n  check-env                                                   Show local configuration status\n  amap search <keywords> [--city]                             Search city POIs through Amap\n  amap geocode <address> [--city]                             Convert an address to GCJ-02 coordinates\n  amap enrich-culture --snapshot YYYY-MM-DD [--limit N]       Match culture records to Amap POIs\n  amap collect <metro|hospital|primary-care> --snapshot DATE  Collect Amap POIs with checkpoints\n  amap collect-metro-lines --snapshot DATE --city             Collect city rail lines and stations\n  amap collect-city-catalogue --snapshot DATE --city 北京市     Collect Beijing categories through Amap\n  sources fetch-culture --snapshot YYYY-MM-DD                 Download official culture source snapshots\n  sources normalize-culture --snapshot YYYY-MM-DD             Normalize culture snapshots to facility records\n  sources import-medical-institutions --snapshot DATE         Normalize manual medical-institution CSV\n  export all --culture-snapshot DATE --amap-snapshot DATE     Create CSV and quality report\n  help                                                        Show this help\n\nBefore live collection:\n  cp .env.example .env\n  # Set AMAP_WEB_KEY in .env\n  npm run check:env`);
+  console.log(`Shanghai Public Facilities Collector\n\nCommands:\n  check-env                                                   Show local configuration status\n  amap search <keywords> [--city]                             Search city POIs through Amap\n  amap geocode <address> [--city]                             Convert an address to GCJ-02 coordinates\n  amap enrich-culture --snapshot YYYY-MM-DD [--limit N]       Match culture records to Amap POIs\n  amap collect <metro|hospital|primary-care> --snapshot DATE  Collect Amap POIs with checkpoints\n  amap collect-metro-lines --snapshot DATE --city             Collect city rail lines and stations\n  amap collect-city-catalogue --snapshot DATE --city 北京市     Collect city categories through Amap\n  amap collect-universities --snapshot DATE --city --city-slug Collect city universities through Amap\n  sources fetch-culture --snapshot YYYY-MM-DD                 Download official culture source snapshots\n  sources normalize-culture --snapshot YYYY-MM-DD             Normalize culture snapshots to facility records\n  sources import-medical-institutions --snapshot DATE         Normalize manual medical-institution CSV\n  export universities --snapshot DATE --city-slug SLUG        Merge universities into one web catalogue\n  export all --culture-snapshot DATE --amap-snapshot DATE     Create CSV and quality report\n  help                                                        Show this help\n\nBefore live collection:\n  cp .env.example .env\n  # Set AMAP_WEB_KEY in .env\n  npm run check:env`);
 }
 
 function checkEnvironment(): number {
@@ -134,6 +136,23 @@ async function runAmapCommand(): Promise<number> {
     }
   }
 
+  if (action === "collect-universities") {
+    const snapshot = optionValue("--snapshot");
+    const citySlug = optionValue("--city-slug");
+    if (!snapshot || !citySlug) {
+      console.error("Usage: amap collect-universities --snapshot DATE --city 上海市 --city-slug shanghai");
+      return 1;
+    }
+    try {
+      const records = await collectUniversities(snapshot, city, citySlug);
+      console.log(JSON.stringify({ city, citySlug, count: records.length }, null, 2));
+      return 0;
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : "Amap university collection failed.");
+      return 4;
+    }
+  }
+
   const client = new AmapClient();
 
   if (!action || !value) {
@@ -202,6 +221,22 @@ async function runSourcesCommand(): Promise<number> {
 }
 
 async function runExportCommand(): Promise<number> {
+  if (process.argv[3] === "universities") {
+    const citySlug = optionValue("--city-slug");
+    const snapshot = optionValue("--snapshot");
+    if (!citySlug || !snapshot) {
+      console.error("Usage: export universities --snapshot DATE --city-slug shanghai");
+      return 1;
+    }
+    try {
+      const result = await mergeUniversitiesIntoWebCatalogue({ citySlug, snapshot });
+      console.log(JSON.stringify(result, null, 2));
+      return 0;
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : "University export failed.");
+      return 4;
+    }
+  }
   if (process.argv[3] === "city") {
     const citySlug = optionValue("--city-slug");
     const snapshot = optionValue("--snapshot");
