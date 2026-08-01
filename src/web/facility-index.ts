@@ -230,6 +230,8 @@ function categorySortOrder(category: string): number {
     "culture.concert_hall",
     "library.all",
     "education.university",
+    "education.school",
+    "education.kindergarten",
     "community.civic_service_center",
     "transit.metro_station",
     "transport.railway_station",

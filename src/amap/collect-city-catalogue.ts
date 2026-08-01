@@ -371,10 +371,24 @@ const ZHUHAI_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
-const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES };
+const EDUCATION_QUERIES: Query[] = [
+  { category: "education.school", keywords: "小学", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/小学/)(poi) },
+  { category: "education.school", keywords: "中学", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/中学|初中|高中/)(poi) },
+  { category: "education.school", keywords: "学校", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/学校|小学|中学|初中|高中/)(poi) },
+  { category: "education.kindergarten", keywords: "幼儿园", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/幼儿园|幼儿|幼稚园/)(poi) },
+];
 
-export async function collectCityCatalogue(snapshot: string, city = "北京市"): Promise<AmapCollectedFacilityRecord[]> {
-  const queries = CITY_QUERIES[city];
+const CITY_QUERIES: Record<string, Query[]> = Object.fromEntries(
+  Object.entries({ "上海市": [], "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES })
+    .map(([city, queries]) => [city, [...queries, ...EDUCATION_QUERIES]]),
+);
+
+export async function collectCityCatalogue(
+  snapshot: string,
+  city = "北京市",
+  options: { educationOnly?: boolean } = {},
+): Promise<AmapCollectedFacilityRecord[]> {
+  const queries = options.educationOnly ? EDUCATION_QUERIES : CITY_QUERIES[city];
   if (!queries) throw new Error(`Unsupported generic city catalogue: ${city}`);
   const directory = join("data", "interim", snapshot);
   const output = join(directory, "amap-city-catalogue.json");

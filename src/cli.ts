@@ -125,7 +125,7 @@ async function runAmapCommand(): Promise<number> {
     const snapshot = optionValue("--snapshot");
     if (!snapshot) { console.error("Usage: amap collect-city-catalogue --snapshot YYYY-MM-DD --city 北京市"); return 1; }
     try {
-      const records = await collectCityCatalogue(snapshot, city);
+      const records = await collectCityCatalogue(snapshot, city, { educationOnly: process.argv.includes("--education-only") });
       const byCategory = Object.fromEntries(Object.entries(Object.groupBy(records, (record) => record.category))
         .map(([category, group]) => [category, group?.length ?? 0]));
       console.log(JSON.stringify({ count: records.length, byCategory }, null, 2));
