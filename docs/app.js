@@ -17,6 +17,7 @@ const shareCloseButton = document.querySelector("#share-close");
 const nativeShareButton = document.querySelector("#native-share");
 const copyShareButton = document.querySelector("#copy-share");
 const saveImageButton = document.querySelector("#save-image");
+const saveImageMobileButton = document.querySelector("#save-image-mobile");
 const shareAddress = document.querySelector("#share-address");
 const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
@@ -118,7 +119,8 @@ shareDialog.addEventListener("click", (event) => {
 });
 nativeShareButton.addEventListener("click", shareCurrentResult);
 copyShareButton.addEventListener("click", copyProjectLink);
-saveImageButton.addEventListener("click", saveResultImage);
+saveImageButton.addEventListener("click", () => saveResultImage("desktop"));
+saveImageMobileButton.addEventListener("click", () => saveResultImage("mobile"));
 
 function initialCity() {
   const value = new URLSearchParams(window.location.search).get("city");
@@ -361,13 +363,15 @@ function openShareDialog() {
   shareDialog.showModal();
 }
 
-async function saveResultImage() {
+async function saveResultImage(variant) {
   if (!latestShare?.groups?.length) return;
   saveImageButton.disabled = true;
-  shareFeedback.textContent = "正在生成结果长图…";
+  saveImageMobileButton.disabled = true;
+  const isMobile = variant === "mobile";
+  shareFeedback.textContent = `正在生成${isMobile ? "手机版" : "桌面版"}长图…`;
   try {
-    const blob = await createShareImage(latestShare);
-    const filename = `近邻-${CITIES[activeCity].name}-结果.png`;
+    const blob = await (isMobile ? createMobileShareImage : createShareImage)(latestShare);
+    const filename = `近邻-${CITIES[activeCity].name}-${isMobile ? "手机版" : "桌面版"}结果.png`;
     const objectUrl = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = objectUrl;
@@ -376,120 +380,191 @@ async function saveResultImage() {
     anchor.click();
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    shareFeedback.textContent = "长图已下载。";
+    shareFeedback.textContent = `${isMobile ? "手机版" : "桌面版"}长图已下载。`;
   } catch (error) {
     if (error?.name !== "AbortError") shareFeedback.textContent = "长图生成失败，请稍后重试。";
   } finally {
     saveImageButton.disabled = false;
+    saveImageMobileButton.disabled = false;
   }
 }
 
 async function createShareImage(share) {
-  const width = 1080;
-  const margin = 48;
-  const gap = 24;
-  const tileWidth = (width - margin * 2 - gap) / 2;
-  const tileHeight = 224;
-  const rows = Math.ceil(share.groups.length / 2);
-  const headerHeight = 224;
-  const footerHeight = 116;
+  return createShareImageVariant(share, {
+    width: 1080,
+    margin: 56,
+    groupGap: 28,
+    columns: 2,
+    headerHeight: 248,
+    footerHeight: 136,
+    qrFrame: 156,
+    tileStyle: {
+      firstRowOffset: 82,
+      rowStep: 69,
+      bottomSpace: 60,
+      headingSize: 23,
+      countSize: 17,
+      numberSize: 16,
+      nameSize: 20,
+      distanceSize: 18,
+      detailSize: 16,
+      tilePadding: 30,
+      detailOffset: 30,
+    },
+    headerStyle: { logoSize: 58, titleSize: 32, addressSize: 24, metaSize: 19 },
+    footerStyle: { labelSize: 19, linkSize: 19 },
+  });
+}
+
+async function createMobileShareImage(share) {
+  return createShareImageVariant(share, {
+    width: 750,
+    margin: 42,
+    groupGap: 24,
+    columns: 1,
+    headerHeight: 300,
+    footerHeight: 178,
+    qrFrame: 148,
+    tileStyle: {
+      firstRowOffset: 96,
+      rowStep: 76,
+      bottomSpace: 64,
+      headingSize: 28,
+      countSize: 21,
+      numberSize: 19,
+      nameSize: 27,
+      distanceSize: 23,
+      detailSize: 20,
+      tilePadding: 34,
+      detailOffset: 34,
+    },
+    headerStyle: { logoSize: 56, titleSize: 34, addressSize: 27, metaSize: 21 },
+    footerStyle: { labelSize: 21, linkSize: 21 },
+  });
+}
+
+async function createShareImageVariant(share, options) {
+  const { width, margin, groupGap, columns, headerHeight, footerHeight, qrFrame, tileStyle, headerStyle, footerStyle } = options;
+  const tileWidth = (width - margin * 2 - groupGap * (columns - 1)) / columns;
+  const tileHeights = share.groups.map((group) => shareTileHeight(group, tileStyle));
+  const rowCount = Math.ceil(share.groups.length / columns);
+  const rowHeights = Array.from({ length: rowCount }, (_, row) => Math.max(...tileHeights.slice(row * columns, row * columns + columns)));
+  const bodyHeight = rowHeights.reduce((sum, height) => sum + height, 0) + Math.max(0, rowCount - 1) * groupGap;
   const canvas = document.createElement("canvas");
   canvas.width = width;
-  canvas.height = headerHeight + rows * (tileHeight + gap) - gap + footerHeight;
+  canvas.height = headerHeight + bodyHeight + footerHeight;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas is unavailable.");
-  context.fillStyle = "#f7f5ef";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  context.fillStyle = "#10223c";
-  context.fillRect(0, 0, width, headerHeight);
-  context.fillStyle = "#e94335";
-  context.fillRect(margin, 38, 58, 58);
-  context.fillStyle = "#ffffff";
-  context.font = '700 34px "Noto Sans SC", sans-serif';
-  context.textAlign = "center";
-  context.fillText("近", margin + 29, 78);
-  context.textAlign = "left";
-  context.font = '700 32px "Noto Sans SC", sans-serif';
-  context.fillText(`${CITIES[activeCity].name}公共设施近邻`, margin + 78, 72);
-  context.font = '500 24px "Noto Sans SC", sans-serif';
-  drawTrimmedText(context, share.address, margin, 132, width - margin * 2 - 180);
-  context.fillStyle = "#b9c4cb";
-  context.font = '400 19px "Noto Sans SC", sans-serif';
-  context.fillText(`${share.groups.length} 个类别 · 每类最多 3 个结果 · 直线距离`, margin, 178);
-
   const qrImage = await Promise.race([
     loadShareQrImage(projectUrl()),
-    new Promise((resolve) => window.setTimeout(() => resolve(null), 1800)),
+    new Promise((resolve) => window.setTimeout(() => resolve(null), 3500)),
   ]);
-  if (qrImage) {
-    context.fillStyle = "#ffffff";
-    context.fillRect(width - margin - 148, 36, 148, 148);
-    context.drawImage(qrImage, width - margin - 140, 44, 132, 132);
-  }
+  context.fillStyle = "#f7f5ef";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  drawShareHeader(context, share, { width, margin, headerHeight, qrFrame, qrImage, ...headerStyle });
 
-  context.textAlign = "left";
+  let rowY = headerHeight;
   share.groups.forEach((group, index) => {
-    const column = index % 2;
-    const row = Math.floor(index / 2);
-    const x = margin + column * (tileWidth + gap);
-    const y = headerHeight + row * (tileHeight + gap);
-    drawShareTile(context, group, x, y, tileWidth, tileHeight);
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    if (column === 0 && index > 0) rowY += rowHeights[row - 1] + groupGap;
+    const x = margin + column * (tileWidth + groupGap);
+    drawShareTile(context, group, x, rowY, tileWidth, rowHeights[row], tileStyle);
   });
 
-  const footerY = canvas.height - footerHeight;
-  context.strokeStyle = "#cdd0cf";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.moveTo(margin, footerY + 8);
-  context.lineTo(width - margin, footerY + 8);
-  context.stroke();
-  context.fillStyle = "#61707a";
-  context.font = '400 19px "Noto Sans SC", sans-serif';
-  context.fillText("打开项目查看实时查询", margin, footerY + 50);
-  context.fillStyle = "#10223c";
-  context.font = '600 19px "Noto Sans SC", sans-serif';
-  drawTrimmedText(context, projectUrl(), margin, footerY + 83, width - margin * 2);
+  drawShareFooter(context, canvas.height - footerHeight, { width, margin, ...footerStyle });
   return canvasToBlob(canvas);
 }
 
-function drawShareTile(context, group, x, y, width, height) {
+function drawShareHeader(context, share, options) {
+  const { width, margin, headerHeight, qrFrame, qrImage, logoSize, titleSize, addressSize, metaSize } = options;
+  const logoY = 34;
+  const titleX = margin + logoSize + 20;
+  const qrReserve = qrImage ? qrFrame + 18 : 0;
+  const titleMaxWidth = width - titleX - margin - qrReserve;
+  const textMaxWidth = width - margin * 2 - qrReserve;
+  context.fillStyle = "#10223c";
+  context.fillRect(0, 0, width, headerHeight);
+  context.fillStyle = "#e94335";
+  context.fillRect(margin, logoY, logoSize, logoSize);
+  context.fillStyle = "#ffffff";
+  context.font = `700 ${Math.round(logoSize * .58)}px "Noto Sans SC", sans-serif`;
+  context.textAlign = "center";
+  context.fillText("近", margin + logoSize / 2, logoY + logoSize * .69);
+  context.textAlign = "left";
+  context.font = `700 ${titleSize}px "Noto Sans SC", sans-serif`;
+  drawTrimmedText(context, `${CITIES[activeCity].name}公共设施近邻`, titleX, logoY + logoSize * .67, titleMaxWidth);
+  context.font = `500 ${addressSize}px "Noto Sans SC", sans-serif`;
+  drawTrimmedText(context, share.address, margin, headerHeight - 104, textMaxWidth);
+  context.fillStyle = "#b9c4cb";
+  context.font = `400 ${metaSize}px "Noto Sans SC", sans-serif`;
+  context.fillText(`${share.groups.length} 个类别 · 每类最多 3 个结果 · 直线距离`, margin, headerHeight - 58);
+  if (qrImage) {
+    const frameX = width - margin - qrFrame;
+    context.fillStyle = "#ffffff";
+    context.fillRect(frameX, 30, qrFrame, qrFrame);
+    context.drawImage(qrImage, frameX + 8, 38, qrFrame - 16, qrFrame - 16);
+  }
+}
+
+function drawShareFooter(context, footerY, options) {
+  const { width, margin, labelSize, linkSize } = options;
+  context.strokeStyle = "#cdd0cf";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(margin, footerY + 16);
+  context.lineTo(width - margin, footerY + 16);
+  context.stroke();
+  context.fillStyle = "#61707a";
+  context.font = `400 ${labelSize}px "Noto Sans SC", sans-serif`;
+  context.fillText("打开项目查看实时查询", margin, footerY + 62);
+  context.fillStyle = "#10223c";
+  context.font = `600 ${linkSize}px "Noto Sans SC", sans-serif`;
+  drawTrimmedText(context, projectUrl(), margin, footerY + 104, width - margin * 2);
+}
+
+function shareTileHeight(group, style) {
+  return style.firstRowOffset + Math.max(0, group.places.length - 1) * style.rowStep + style.bottomSpace;
+}
+
+function drawShareTile(context, group, x, y, width, height, style) {
   const meta = categoryMeta(group.category);
   context.fillStyle = "#ffffff";
   context.fillRect(x, y, width, height);
   context.fillStyle = meta.color;
-  context.fillRect(x, y, 10, height);
+  context.fillRect(x, y, width, 8);
   context.fillStyle = "#18252c";
-  context.font = '700 23px "Noto Sans SC", sans-serif';
-  context.fillText(meta.label, x + 28, y + 37);
+  context.font = `700 ${style.headingSize}px "Noto Sans SC", sans-serif`;
+  context.fillText(meta.label, x + style.tilePadding, y + 44);
   context.fillStyle = "#61707a";
-  context.font = '400 17px "Noto Sans SC", sans-serif';
+  context.font = `400 ${style.countSize}px "Noto Sans SC", sans-serif`;
   context.textAlign = "right";
-  context.fillText(`${group.places.length} 个`, x + width - 22, y + 37);
+  context.fillText(`${group.places.length} 个`, x + width - style.tilePadding, y + 44);
   context.textAlign = "left";
   group.places.forEach((place, index) => {
-    const rowY = y + 58 + index * 52;
+    const rowY = y + style.firstRowOffset + index * style.rowStep;
     context.strokeStyle = "#e2e3df";
     context.lineWidth = 1;
     context.beginPath();
-    context.moveTo(x + 28, rowY - 13);
-    context.lineTo(x + width - 22, rowY - 13);
+    context.moveTo(x + style.tilePadding, rowY - 25);
+    context.lineTo(x + width - style.tilePadding, rowY - 25);
     context.stroke();
     context.fillStyle = "#7a858b";
-    context.font = '600 16px system-ui, sans-serif';
-    context.fillText(String(index + 1).padStart(2, "0"), x + 28, rowY + 7);
+    context.font = `600 ${style.numberSize}px system-ui, sans-serif`;
+    context.fillText(String(index + 1).padStart(2, "0"), x + style.tilePadding, rowY + 6);
     context.fillStyle = "#18252c";
-    context.font = '600 19px "Noto Sans SC", sans-serif';
-    drawTrimmedText(context, place.name, x + 68, rowY + 5, width - 190);
+    context.font = `600 ${style.nameSize}px "Noto Sans SC", sans-serif`;
+    const textX = x + style.tilePadding + 40;
+    drawTrimmedText(context, place.name, textX, rowY + 5, width - style.tilePadding * 2 - 160);
     context.fillStyle = meta.color;
-    context.font = '700 18px system-ui, sans-serif';
+    context.font = `700 ${style.distanceSize}px system-ui, sans-serif`;
     context.textAlign = "right";
-    context.fillText(formatDistance(place.distanceMeters), x + width - 22, rowY + 5);
+    context.fillText(formatDistance(place.distanceMeters), x + width - style.tilePadding, rowY + 5);
     context.textAlign = "left";
     context.fillStyle = "#61707a";
-    context.font = '400 15px "Noto Sans SC", sans-serif';
-    const detail = [place.district, place.address].filter(Boolean).join(" · ");
-    drawTrimmedText(context, detail || "地址待补充", x + 68, rowY + 27, width - 96);
+    context.font = `400 ${style.detailSize}px "Noto Sans SC", sans-serif`;
+    const detail = [place.metroLines?.join(" · "), place.district, place.address].filter(Boolean).join(" · ");
+    drawTrimmedText(context, detail || "地址待补充", textX, rowY + style.detailOffset, width - style.tilePadding * 2 - 40);
   });
 }
 
