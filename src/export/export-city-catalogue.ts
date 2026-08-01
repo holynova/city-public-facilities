@@ -46,6 +46,13 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "wuhu" && record.category === "landmark.city_landmark") {
     return ["鸠兹古镇", "芜湖古城", "芜湖方特乐园", "芜湖方特梦幻王国", "芜湖方特东方神画", "芜湖方特水上乐园", "中山路步行街", "广济寺", "天门山景区", "天门山公园"].includes(record.name);
   }
+  if (citySlug === "zhuhai" && record.category === "transport.airport") return record.name === "珠海金湾机场";
+  if (citySlug === "zhuhai" && record.category === "hospital.secondary_a") {
+    return /医院$/.test(record.name) && !/妇产科|体检科|住院部/.test(record.name);
+  }
+  if (citySlug === "zhuhai" && record.category === "landmark.city_landmark") {
+    return ["珠海日月贝", "情侣路", "港珠澳大桥", "港珠澳大桥(珠海段)", "长隆海洋王国", "圆明新园", "横琴金融岛中央公园"].includes(record.name);
+  }
   if (citySlug === "beijing" && record.category === "landmark.city_landmark" && record.searchEvidence.includes("国贸CBD")) return false;
   if (citySlug === "beijing" && record.category === "transport.airport") return ["北京首都国际机场", "北京大兴国际机场"].includes(record.name);
   if (citySlug === "beijing" && record.category === "landmark.city_landmark") {

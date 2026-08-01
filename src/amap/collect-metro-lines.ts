@@ -70,6 +70,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: ["轨道交通1号线", "轨道交通2号线", "芜湖轨道交通1号线", "芜湖轨道交通2号线"],
     outputFile: "amap-metro-lines.json",
   },
+  "珠海市": {
+    cityCode: "0756",
+    lineQueries: [],
+    outputFile: "amap-metro-lines.json",
+  },
 } as const;
 
 const NANJING_OPERATING_LINES = new Set([

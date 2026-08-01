@@ -34,6 +34,7 @@ const CITIES = {
   nanjing: { name: "南京", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
   chengdu: { name: "成都", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
   wuhu: { name: "芜湖", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
+  zhuhai: { name: "珠海", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
 };
 
 let facilities = [];

@@ -9,6 +9,7 @@ const CITIES = [
   ["nanjing", "南京"],
   ["chengdu", "成都"],
   ["wuhu", "芜湖"],
+  ["zhuhai", "珠海"],
 ];
 
 const cityBoard = document.querySelector("#city-board");

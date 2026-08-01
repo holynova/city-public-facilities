@@ -332,7 +332,46 @@ const WUHU_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
-const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES };
+const ZHUHAI_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|书屋|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "音乐厅", allPages: true, accepts: named(/音乐厅|音乐堂|大剧院|剧院|演艺中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.big_box_retail", keywords: "山姆会员商店", accepts: typedNamed("06", /山姆会员商店/) },
+  { category: "commerce.big_box_retail", keywords: "麦德龙", accepts: typedNamed("06", /麦德龙/) },
+  { category: "commerce.big_box_retail", keywords: "宜家家居", accepts: typedNamed("06", /宜家/) },
+  { category: "commerce.big_box_retail", keywords: "开市客", accepts: typedNamed("06", /开市客|Costco/i) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|万象|万达|华发|天虹|优特汇|大悦城|吾悦/) },
+  { category: "transport.railway_station", keywords: "珠海站", accepts: typedNamed("150200", /^珠海站$/) },
+  { category: "transport.railway_station", keywords: "珠海北站", accepts: typedNamed("150200", /^珠海北站$/) },
+  { category: "transport.railway_station", keywords: "明珠站", accepts: typedNamed("150200", /^明珠站$/) },
+  { category: "transport.railway_station", keywords: "前山站", accepts: typedNamed("150200", /^前山站$/) },
+  { category: "transport.railway_station", keywords: "唐家湾站", accepts: typedNamed("150200", /^唐家湾站$/) },
+  { category: "transport.railway_station", keywords: "横琴站", accepts: typedNamed("150200", /^横琴站$/) },
+  { category: "transport.airport", keywords: "珠海金湾机场", accepts: typedNamed("150104", /珠海金湾机场/) },
+  { category: "landmark.city_landmark", keywords: "珠海大剧院", accepts: named(/珠海大剧院/) },
+  { category: "landmark.city_landmark", keywords: "情侣路", accepts: named(/^情侣路$/) },
+  { category: "landmark.city_landmark", keywords: "港珠澳大桥", accepts: named(/港珠澳大桥/) },
+  { category: "landmark.city_landmark", keywords: "长隆海洋王国", accepts: named(/长隆海洋王国/) },
+  { category: "landmark.city_landmark", keywords: "圆明新园", accepts: named(/^圆明新园$/) },
+  { category: "landmark.city_landmark", keywords: "城市阳台", accepts: named(/^城市阳台$/) },
+  { category: "landmark.city_landmark", keywords: "日月贝", accepts: named(/日月贝|珠海歌剧院/) },
+  { category: "landmark.city_landmark", keywords: "横琴金融岛", accepts: named(/横琴金融岛/) },
+  { category: "park.major_city_park", keywords: "景山公园", accepts: typedNamed("11", /^景山公园$/) },
+  { category: "park.major_city_park", keywords: "海滨公园", accepts: typedNamed("11", /^海滨公园$/) },
+  { category: "park.major_city_park", keywords: "香山公园", accepts: typedNamed("11", /^香山公园$/) },
+  { category: "park.major_city_park", keywords: "白莲洞公园", accepts: typedNamed("11", /^白莲洞公园$/) },
+  { category: "park.major_city_park", keywords: "板樟山森林公园", accepts: typedNamed("11", /板樟山森林公园/) },
+  { category: "park.major_city_park", keywords: "淇澳岛", accepts: typedNamed("11", /淇澳岛/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
+const CITY_QUERIES: Record<string, Query[]> = { "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES };
 
 export async function collectCityCatalogue(snapshot: string, city = "北京市"): Promise<AmapCollectedFacilityRecord[]> {
   const queries = CITY_QUERIES[city];
