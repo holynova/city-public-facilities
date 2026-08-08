@@ -96,6 +96,10 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "wuhan" && record.category === "landmark.city_landmark") {
     return ["黄鹤楼", "东湖风景区", "户部巷", "武汉长江大桥", "楚河汉街", "湖北省博物馆", "江汉路步行街"].includes(record.name);
   }
+  if (citySlug === "xian" && record.category === "transport.airport") return record.name === "西安咸阳国际机场";
+  if (citySlug === "xian" && record.category === "landmark.city_landmark") {
+    return ["大雁塔", "西安城墙", "钟楼", "西安钟楼", "大唐不夜城", "大明宫国家遗址公园", "陕西历史博物馆", "回民街", "西安回民街"].includes(record.name);
+  }
   return true;
 }
 function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
