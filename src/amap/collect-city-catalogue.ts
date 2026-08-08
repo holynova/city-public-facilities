@@ -299,6 +299,42 @@ const CHENGDU_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
+const CHONGQING_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|书屋|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "音乐厅", allPages: true, accepts: named(/音乐厅|音乐堂|大剧院|剧院|演艺中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.big_box_retail", keywords: "山姆会员商店", accepts: typedNamed("06", /山姆会员商店/) },
+  { category: "commerce.big_box_retail", keywords: "麦德龙", accepts: typedNamed("06", /麦德龙/) },
+  { category: "commerce.big_box_retail", keywords: "宜家家居", accepts: typedNamed("06", /宜家/) },
+  { category: "commerce.big_box_retail", keywords: "开市客", accepts: typedNamed("06", /开市客|Costco/i) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|万象|来福士|大悦城|龙湖|时代天街|星光68|国金中心|万达/) },
+  { category: "transport.railway_station", keywords: "重庆北站", accepts: typedNamed("150200", /^重庆北站$/) },
+  { category: "transport.railway_station", keywords: "重庆西站", accepts: typedNamed("150200", /^重庆西站$/) },
+  { category: "transport.railway_station", keywords: "重庆站", accepts: typedNamed("150200", /^重庆站$/) },
+  { category: "transport.railway_station", keywords: "沙坪坝站", accepts: typedNamed("150200", /^沙坪坝站$/) },
+  { category: "transport.airport", keywords: "重庆江北国际机场", accepts: typedNamed("150104", /重庆江北国际机场/) },
+  { category: "landmark.city_landmark", keywords: "解放碑", accepts: named(/解放碑/) },
+  { category: "landmark.city_landmark", keywords: "洪崖洞", accepts: named(/洪崖洞/) },
+  { category: "landmark.city_landmark", keywords: "磁器口古镇", accepts: named(/磁器口古镇/) },
+  { category: "landmark.city_landmark", keywords: "朝天门", accepts: named(/朝天门/) },
+  { category: "landmark.city_landmark", keywords: "重庆人民大礼堂", accepts: named(/重庆人民大礼堂|人民大礼堂/) },
+  { category: "landmark.city_landmark", keywords: "长江索道", accepts: named(/长江索道/) },
+  { category: "landmark.city_landmark", keywords: "重庆动物园", accepts: named(/重庆动物园/) },
+  { category: "park.major_city_park", keywords: "重庆园博园", accepts: typedNamed("11", /重庆园博园/) },
+  { category: "park.major_city_park", keywords: "重庆中央公园", accepts: typedNamed("11", /重庆中央公园/) },
+  { category: "park.major_city_park", keywords: "南山植物园", accepts: typedNamed("11", /南山植物园/) },
+  { category: "park.major_city_park", keywords: "照母山森林公园", accepts: typedNamed("11", /照母山森林公园/) },
+  { category: "park.major_city_park", keywords: "鹅岭公园", accepts: typedNamed("11", /鹅岭公园/) },
+  { category: "park.major_city_park", keywords: "歌乐山森林公园", accepts: typedNamed("11", /歌乐山森林公园/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
 const WUHU_QUERIES: Query[] = [
   { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
   { category: "culture.art_gallery", keywords: "美术馆", allPages: true, accepts: named(/美术馆|艺术馆|画廊|艺术中心/) },
@@ -379,7 +415,7 @@ const EDUCATION_QUERIES: Query[] = [
 ];
 
 const CITY_QUERIES: Record<string, Query[]> = Object.fromEntries(
-  Object.entries({ "上海市": [], "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES })
+  Object.entries({ "上海市": [], "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "重庆市": CHONGQING_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES })
     .map(([city, queries]) => [city, [...queries, ...EDUCATION_QUERIES]]),
 );
 

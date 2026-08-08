@@ -65,6 +65,11 @@ const CITY_RAIL_CONFIG = {
     lineQueries: [...Array.from({ length: 10 }, (_, index) => `地铁${index + 1}号线`), "地铁13号线", "地铁17号线", "地铁18号线", "地铁19号线", "地铁27号线", "地铁30号线", "蓉2号线", "资阳线"],
     outputFile: "amap-metro-lines.json",
   },
+  "重庆市": {
+    cityCode: "023",
+    lineQueries: [...Array.from({ length: 6 }, (_, index) => `地铁${index + 1}号线`), "地铁9号线", "地铁10号线", "地铁18号线", "重庆轨道交通环线", "环线", "江跳线", "璧山线"],
+    outputFile: "amap-metro-lines.json",
+  },
   "芜湖市": {
     cityCode: "0553",
     lineQueries: ["轨道交通1号线", "轨道交通2号线", "芜湖轨道交通1号线", "芜湖轨道交通2号线"],
@@ -97,7 +102,7 @@ const NANJING_OPERATING_LINES = new Set([
 export async function collectMetroFromLines(snapshot: string, city = "上海市"): Promise<AmapCollectedFacilityRecord[]> {
   const config = CITY_RAIL_CONFIG[city as keyof typeof CITY_RAIL_CONFIG];
   if (!config) throw new Error(`Unsupported metro collection city: ${city}`);
-  const client = new AmapClient(city === "成都市" ? 6_500 : 1_100);
+  const client = new AmapClient(city === "成都市" ? 6_500 : city === "重庆市" ? 2_000 : 1_100);
   const lines = new Map<string, AmapBusLine>();
   for (const query of config.lineQueries) {
     console.error(`Amap metro line search: ${query}`);

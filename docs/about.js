@@ -8,6 +8,7 @@ const CITIES = [
   ["hefei", "合肥"],
   ["nanjing", "南京"],
   ["chengdu", "成都"],
+  ["chongqing", "重庆"],
   ["wuhu", "芜湖"],
   ["zhuhai", "珠海"],
 ];
