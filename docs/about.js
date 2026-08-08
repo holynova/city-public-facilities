@@ -9,6 +9,7 @@ const CITIES = [
   ["nanjing", "南京"],
   ["chengdu", "成都"],
   ["chongqing", "重庆"],
+  ["wuhan", "武汉"],
   ["wuhu", "芜湖"],
   ["zhuhai", "珠海"],
 ];

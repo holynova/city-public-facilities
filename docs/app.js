@@ -36,6 +36,7 @@ const CITIES = {
   nanjing: { name: "南京", region: "华东", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
   chengdu: { name: "成都", region: "西南", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
   chongqing: { name: "重庆", region: "西南", geocodeName: "重庆市", example: "解放碑", center: { latitude: 29.5630, longitude: 106.5516 } },
+  wuhan: { name: "武汉", region: "华中", geocodeName: "武汉市", example: "黄鹤楼", center: { latitude: 30.5928, longitude: 114.3055 } },
   wuhu: { name: "芜湖", region: "华东", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
   zhuhai: { name: "珠海", region: "华南", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
 };

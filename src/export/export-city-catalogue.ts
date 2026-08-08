@@ -92,6 +92,10 @@ function shouldExportCatalogueRecord(record: AmapCollectedFacilityRecord, citySl
   if (citySlug === "chongqing" && record.category === "landmark.city_landmark") {
     return ["解放碑", "洪崖洞", "磁器口古镇", "朝天门", "重庆人民大礼堂", "人民大礼堂", "长江索道", "重庆动物园"].includes(record.name);
   }
+  if (citySlug === "wuhan" && record.category === "transport.airport") return record.name === "武汉天河国际机场";
+  if (citySlug === "wuhan" && record.category === "landmark.city_landmark") {
+    return ["黄鹤楼", "东湖风景区", "户部巷", "武汉长江大桥", "楚河汉街", "湖北省博物馆", "江汉路步行街"].includes(record.name);
+  }
   return true;
 }
 function shouldExportMetroRecord(record: AmapCollectedFacilityRecord, citySlug: string): boolean {
