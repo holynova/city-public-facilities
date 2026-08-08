@@ -1,15 +1,15 @@
 {
-  "name": "shanghai-public-facilities",
+  "name": "city-public-facilities",
   "version": "0.1.0",
-  "description": "上海公共地点近邻检索",
+  "description": "城市公共地点近邻检索",
   "private": true,
-  "homepage": "https://holynova.github.io/shanghai-public-facilities/",
+  "homepage": "https://holynova.github.io/city-public-facilities/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/holynova/shanghai-public-facilities.git"
+    "url": "git+https://github.com/holynova/city-public-facilities.git"
   },
   "bugs": {
-    "url": "https://github.com/holynova/shanghai-public-facilities/issues"
+    "url": "https://github.com/holynova/city-public-facilities/issues"
   },
   "type": "module",
   "engines": {
