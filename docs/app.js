@@ -9,7 +9,8 @@ const shareButton = document.querySelector("#open-share");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
-const citySwitch = document.querySelector("#city-switch");
+const citySelect = document.querySelector("#city-select");
+const activeCityLabel = document.querySelector("#active-city-label");
 const dataNote = document.querySelector("#data-note");
 const shareKicker = document.querySelector("#share-kicker");
 const shareDialog = document.querySelector("#share-dialog");
@@ -25,18 +26,19 @@ const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_LIMIT = 5;
 const HISTORY_VISIBLE_LIMIT = 2;
 const CITIES = {
-  shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
-  beijing: { name: "北京", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
-  hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
-  guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
-  shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
-  suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
-  hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
-  nanjing: { name: "南京", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
-  chengdu: { name: "成都", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
-  wuhu: { name: "芜湖", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
-  zhuhai: { name: "珠海", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
+  shanghai: { name: "上海", region: "华东", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
+  beijing: { name: "北京", region: "华北", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
+  hangzhou: { name: "杭州", region: "华东", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
+  guangzhou: { name: "广州", region: "华南", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
+  shenzhen: { name: "深圳", region: "华南", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
+  suzhou: { name: "苏州", region: "华东", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
+  hefei: { name: "合肥", region: "华东", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
+  nanjing: { name: "南京", region: "华东", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
+  chengdu: { name: "成都", region: "西南", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
+  wuhu: { name: "芜湖", region: "华东", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
+  zhuhai: { name: "珠海", region: "华南", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
 };
+const CITY_REGION_ORDER = ["华东", "华北", "华南", "西南", "华中", "西北", "东北"];
 const MAJOR_GROUPS = [
   { key: "education", label: "教育", shortLabel: "教育", color: "#5857a6", categories: ["education.university", "education.school", "education.kindergarten"] },
   { key: "transport", label: "交通", shortLabel: "交通", color: "#009a74", categories: ["transit.metro_station", "transport.railway_station", "transport.airport"] },
@@ -81,11 +83,7 @@ form.addEventListener("submit", (event) => {
   searchNearby(addressInput.value.trim());
 });
 
-citySwitch.addEventListener("click", (event) => {
-  const target = event.target.closest("button[data-city]");
-  if (!target || target.dataset.city === activeCity) return;
-  switchCity(target.dataset.city);
-});
+citySelect.addEventListener("change", () => switchCity(citySelect.value));
 
 historyItems.addEventListener("click", (event) => {
   const target = event.target.closest("button[data-address]");
@@ -161,9 +159,21 @@ function applyCityUi(city) {
   addressInput.placeholder = `例如：${cityConfig.example}`;
   dataNote.textContent = `${cityConfig.name}数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛`;
   shareKicker.textContent = `${cityConfig.name}公共设施近邻检索`;
-  citySwitch.querySelectorAll("button[data-city]").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.city === city));
+  citySelect.value = city;
+  activeCityLabel.textContent = cityConfig.name;
+}
+
+function renderCityOptions() {
+  const regions = new Map(CITY_REGION_ORDER.map((region) => [region, []]));
+  Object.entries(CITIES).forEach(([slug, city]) => {
+    const cities = regions.get(city.region) ?? [];
+    cities.push({ slug, ...city });
+    regions.set(city.region, cities);
   });
+  citySelect.innerHTML = [...regions.entries()]
+    .filter(([, cities]) => cities.length > 0)
+    .map(([region, cities]) => `<optgroup label="${escapeHtml(region)}">${cities.map((city) => `<option value="${city.slug}">${escapeHtml(city.name)}</option>`).join("")}</optgroup>`)
+    .join("");
 }
 
 async function searchNearby(address) {
@@ -715,5 +725,6 @@ function formatCoordinate(latitude, longitude) { return `${latitude.toFixed(5)}�
 function majorGroupId(key) { return `major-${key}`; }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character])); }
 
+renderCityOptions();
 applyCityUi(activeCity);
 renderSearchHistory();

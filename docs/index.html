@@ -22,18 +22,12 @@
         <div class="search-copy">
           <h1 id="page-title">最近地点清单</h1>
           <p>选择城市，输入地址，按大组找到最近的公共设施。</p>
-          <div id="city-switch" class="city-switch" role="group" aria-label="选择城市">
-            <button type="button" data-city="shanghai" aria-pressed="true">上海</button>
-            <button type="button" data-city="beijing" aria-pressed="false">北京</button>
-            <button type="button" data-city="hangzhou" aria-pressed="false">杭州</button>
-            <button type="button" data-city="guangzhou" aria-pressed="false">广州</button>
-            <button type="button" data-city="shenzhen" aria-pressed="false">深圳</button>
-            <button type="button" data-city="suzhou" aria-pressed="false">苏州</button>
-            <button type="button" data-city="hefei" aria-pressed="false">合肥</button>
-            <button type="button" data-city="nanjing" aria-pressed="false">南京</button>
-            <button type="button" data-city="chengdu" aria-pressed="false">成都</button>
-            <button type="button" data-city="wuhu" aria-pressed="false">芜湖</button>
-            <button type="button" data-city="zhuhai" aria-pressed="false">珠海</button>
+          <div id="city-switch" class="city-picker" role="group" aria-label="选择城市">
+            <div class="city-picker-meta"><span>当前城市</span><strong id="active-city-label">上海</strong></div>
+            <label class="city-select-wrap">
+              <span class="sr-only">切换城市</span>
+              <select id="city-select" name="city" aria-label="切换城市"></select>
+            </label>
           </div>
         </div>
       </section>
