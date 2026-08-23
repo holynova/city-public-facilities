@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>example-site-geo-page-audit</title>
+  <style>
+
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; }
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; }
+code span.at { color: #7d9029; }
+code span.bn { color: #40a070; }
+code span.bu { color: #008000; }
+code span.cf { color: #007020; font-weight: bold; }
+code span.ch { color: #4070a0; }
+code span.cn { color: #880000; }
+code span.co { color: #60a0b0; font-style: italic; }
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; }
+code span.do { color: #ba2121; font-style: italic; }
+code span.dt { color: #902000; }
+code span.dv { color: #40a070; }
+code span.er { color: #ff0000; font-weight: bold; }
+code span.ex { }
+code span.fl { color: #40a070; }
+code span.fu { color: #06287e; }
+code span.im { color: #008000; font-weight: bold; }
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; }
+code span.kw { color: #007020; font-weight: bold; }
+code span.op { color: #666666; }
+code span.ot { color: #007020; }
+code span.pp { color: #bc7a00; }
+code span.sc { color: #4070a0; }
+code span.ss { color: #bb6688; }
+code span.st { color: #4070a0; }
+code span.va { color: #19177c; }
+code span.vs { color: #4070a0; }
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
+</style>
+  <style type="text/css">:root{--parchment:#f5f4ed;--ivory:#faf9f5;--warm-sand:#e8e6dc;--brand:#1B365D;--near-black:#141413;--dark-warm:#3d3d3a;--olive:#5e5d59;--stone:#87867f;--border-cream:#e8e5da;--ring-warm:#d1cfc5;--tag-blue:#EEF2F7}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--parchment)}
+body{max-width:1120px;margin:24px auto 64px;padding:0 22px;background:var(--parchment);color:var(--near-black);font-family:"Source Han Sans SC","PingFang SC","Microsoft YaHei",Arial,sans-serif;font-size:14px;line-height:1.55}
+#TOC{position:sticky;top:0;z-index:20;margin:0 0 22px;padding:10px 14px;border:1px solid var(--border-cream);border-left:3px solid var(--brand);background:var(--ivory);box-shadow:0 0 0 1px var(--warm-sand);max-height:34vh;overflow:auto}
+#TOC>ul{display:flex;flex-wrap:wrap;gap:5px 12px;list-style:none;margin:0;padding:0}
+#TOC ul ul{display:none}
+#TOC a{display:inline-block;padding:2px 0;color:var(--brand);text-decoration:none;font-size:12px;line-height:1.35}
+#TOC a:hover{text-decoration:underline}
+h1{margin:0 0 18px;padding:30px 32px 18px;border:1px solid var(--border-cream);border-left:4px solid var(--brand);background:var(--ivory);font-family:"TsangerJinKai02","Source Han Serif SC","Noto Serif CJK SC","Songti SC",Georgia,serif;font-size:32px;font-weight:500;line-height:1.2;color:var(--near-black)}
+h2{scroll-margin-top:92px;margin:28px 0 12px;padding:0 0 0 10px;border-left:3px solid var(--brand);font-family:"TsangerJinKai02","Source Han Serif SC","Noto Serif CJK SC","Songti SC",Georgia,serif;color:var(--near-black);font-size:22px;font-weight:500;line-height:1.25}
+h3{margin:20px 0 8px;font-family:"TsangerJinKai02","Source Han Serif SC","Noto Serif CJK SC","Songti SC",Georgia,serif;font-size:17px;font-weight:500;line-height:1.3;color:var(--dark-warm)}
+blockquote{margin:0 0 18px;padding:10px 14px;border-left:2px solid var(--brand);background:var(--ivory);color:var(--olive);line-height:1.55}
+a,code{overflow-wrap:anywhere;word-break:break-word}
+table{width:100%;max-width:100%;border-collapse:collapse;table-layout:fixed;margin:14px 0 22px;background:var(--ivory)}
+th,td{padding:7px 8px;border:1px solid var(--border-cream);text-align:left;vertical-align:top;font-size:11.6px;line-height:1.42;word-break:break-word;overflow-wrap:anywhere;hyphens:auto}
+thead th{background:var(--tag-blue);color:var(--brand);font-weight:600}
+pre{margin:14px 0 22px;padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid var(--border-cream);border-radius:6px;background:var(--ivory);font-size:12px;line-height:1.45}
+code{color:var(--dark-warm)}
+@page{size:A4;margin:20mm 22mm;background:#f5f4ed}
+@media print{body{max-width:none;margin:0;padding:0}#TOC{display:none}h1,h2,table,pre,blockquote{break-inside:avoid}}
+@media(max-width:720px){body{margin-top:10px;padding:0 12px 36px}#TOC{max-height:32vh;margin-bottom:16px;padding:8px 10px}#TOC>ul{display:block}h1{padding:22px 18px 14px;font-size:26px}h2{scroll-margin-top:120px}table{display:block;overflow-x:auto;table-layout:auto}}
+</style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#示例站点页面-geo-诊断报告" id="toc-示例站点页面-geo-诊断报告">示例站点页面 GEO 诊断报告</a>
+<ul>
+<li><a href="#执行摘要" id="toc-执行摘要">1. 执行摘要</a></li>
+<li><a href="#输入与诊断边界" id="toc-输入与诊断边界">2.
+输入与诊断边界</a></li>
+<li><a href="#页面组合与选择依据" id="toc-页面组合与选择依据">3.
+页面组合与选择依据</a></li>
+<li><a href="#公开答案素材问题集" id="toc-公开答案素材问题集">4.
+公开答案素材问题集</a></li>
+<li><a href="#权威证据台账" id="toc-权威证据台账">5.
+权威证据台账</a></li>
+<li><a href="#可抓取性与渲染诊断" id="toc-可抓取性与渲染诊断">6.
+可抓取性与渲染诊断</a></li>
+<li><a href="#移动端性能与可访问结构" id="toc-移动端性能与可访问结构">7.
+移动端、性能与可访问结构</a></li>
+<li><a href="#结构规范性与内容信号" id="toc-结构规范性与内容信号">8.
+结构规范性与内容信号</a></li>
+<li><a href="#ai-可抽取性诊断" id="toc-ai-可抽取性诊断">9. AI
+可抽取性诊断</a></li>
+<li><a href="#schema-一致性诊断" id="toc-schema-一致性诊断">10. Schema
+一致性诊断</a></li>
+<li><a href="#代码层修复清单" id="toc-代码层修复清单">11.
+代码层修复清单</a></li>
+<li><a href="#内容结构改造建议" id="toc-内容结构改造建议">12.
+内容结构改造建议</a></li>
+<li><a href="#schema-与-html-模块建议" id="toc-schema-与-html-模块建议">13. Schema 与 HTML 模块建议</a></li>
+<li><a href="#优先级路线图" id="toc-优先级路线图">14.
+优先级路线图</a></li>
+<li><a href="#验收命令" id="toc-验收命令">15. 验收命令</a></li>
+<li><a href="#完整性自检" id="toc-完整性自检">16. 完整性自检</a></li>
+</ul></li>
+</ul>
+</nav>
+<!--
+Copyright © 2026 姚金刚. All rights reserved.
+Project: yao-geo-page-audit
+Created by: 姚金刚
+Date: 2026-05-16
+X: https://x.com/yaojingang
+-->
+<h1 id="示例站点页面-geo-诊断报告">示例站点页面 GEO 诊断报告</h1>
+<blockquote>
+<p>公开合成示例。品牌：示例云服。站点：<a href="https://www.example.com/">示例官网</a>。分析日期：2026-05-21。生成方式：<code>yao-geo-page-audit</code>。本报告用于展示
+skill 的完整输出结构，不代表真实企业诊断结论。</p>
+</blockquote>
+<h2 id="执行摘要">1. 执行摘要</h2>
+<p>示例站点的 GEO 风险集中在三个层面：第一，核心正文和 FAQ 的初始 HTML
+可读性不足；第二，产品事实缺少可切片引用的表格、键值对和上下文无关摘要；第三，schema
+中的服务范围、价格和 FAQ 字段没有稳定回到页面正文。</p>
+<p>优先级判断：</p>
+<ul>
+<li>P0：核心产品说明、服务边界和 FAQ 必须进入初始
+HTML，不能只依赖客户端渲染。</li>
+<li>P0：schema 字段必须与页面正文一致，特别是价格、服务范围和 FAQ。</li>
+<li>P1：首页、一级页和二级页都应增加“事实卡、对比表、FAQ、更新时间、来源”模块。</li>
+<li>P1：HTML 报告、官网页面和 Word 交付件都要避免宽表右溢。</li>
+</ul>
+<h2 id="输入与诊断边界">2. 输入与诊断边界</h2>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>品牌</td>
+<td>示例云服</td>
+</tr>
+<tr>
+<td>目标 URL</td>
+<td>示例官网首页</td>
+</tr>
+<tr>
+<td>页面范围</td>
+<td>首页、产品一级页、订单协同二级页</td>
+</tr>
+<tr>
+<td>目标问题</td>
+<td>示例云服是什么、适合什么企业、订单协同如何使用</td>
+</tr>
+<tr>
+<td>输入缺口</td>
+<td>无日志、无 CMS 权限、无用户提供的 AI 平台采样</td>
+</tr>
+</tbody>
+</table>
+<p>本报告只能做前台可观察诊断，不能判断真实抓取频次、搜索展示量、AI
+平台内部召回权重、答案频次、引用份额或付费工具数据。没有平台采样时，本报告只输出公开素材覆盖和页面可抽取性建议。</p>
+<h2 id="页面组合与选择依据">3. 页面组合与选择依据</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>页面层级</th>
+<th>页面</th>
+<th>页面类型</th>
+<th>选择依据</th>
+<th>AI 素材作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首页</td>
+<td>示例官网首页</td>
+<td>品牌实体页</td>
+<td>品牌入口和导航中心</td>
+<td>建立品牌、产品线和服务对象理解</td>
+</tr>
+<tr>
+<td>一级页</td>
+<td>产品栏目页</td>
+<td>产品栏目页</td>
+<td>承接核心产品关键词</td>
+<td>提供产品分类、适用场景和服务边界</td>
+</tr>
+<tr>
+<td>二级页</td>
+<td>订单协同详情页</td>
+<td>产品详情页</td>
+<td>承接具体功能问题</td>
+<td>提供功能、步骤、案例和 FAQ</td>
+</tr>
+</tbody>
+</table>
+<h2 id="公开答案素材问题集">4. 公开答案素材问题集</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>用户问题</th>
+<th>页面应提供的官方素材</th>
+<th>当前公开素材缺口</th>
+<th>修复模块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>示例云服是什么？</td>
+<td>品牌定义、产品线、适用行业、客户类型</td>
+<td>首页摘要不完整</td>
+<td>品牌事实卡</td>
+</tr>
+<tr>
+<td>示例云服适合中小制造企业吗？</td>
+<td>适用对象、部署方式、服务边界</td>
+<td>缺少适用/不适用说明</td>
+<td>服务边界表</td>
+</tr>
+<tr>
+<td>示例云服和通用 CRM 有什么区别？</td>
+<td>对比表、功能边界、典型场景</td>
+<td>缺少公开对比素材</td>
+<td>产品对比表</td>
+</tr>
+<tr>
+<td>订单协同怎么落地？</td>
+<td>步骤、角色、数据字段、案例</td>
+<td>缺少步骤化模块</td>
+<td>落地步骤表</td>
+</tr>
+<tr>
+<td>示例云服多少钱？</td>
+<td>价格获取方式、套餐边界、更新时间</td>
+<td>缺少价格边界说明</td>
+<td>价格说明卡</td>
+</tr>
+</tbody>
+</table>
+<h2 id="权威证据台账">5. 权威证据台账</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>结论</th>
+<th>来源层级</th>
+<th>页面或材料</th>
+<th>影响</th>
+<th>可信度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心 FAQ 不在初始 HTML</td>
+<td>观察</td>
+<td>产品详情页源代码</td>
+<td>影响问答抽取</td>
+<td>高</td>
+</tr>
+<tr>
+<td>schema 含服务范围字段</td>
+<td>观察</td>
+<td>JSON-LD 片段</td>
+<td>需要正文回溯</td>
+<td>中</td>
+</tr>
+<tr>
+<td>价格信息缺少正文说明</td>
+<td>观察</td>
+<td>产品页正文</td>
+<td>易产生过时答案</td>
+<td>中</td>
+</tr>
+<tr>
+<td>结构化数据需代表正文</td>
+<td>标准</td>
+<td>Google 结构化数据指南</td>
+<td>防止误导性 schema</td>
+<td>高</td>
+</tr>
+<tr>
+<td>主内容抽取会受导航干扰</td>
+<td>研究</td>
+<td>正文抽取研究</td>
+<td>需要明确主内容边界</td>
+<td>中</td>
+</tr>
+</tbody>
+</table>
+<h2 id="可抓取性与渲染诊断">6. 可抓取性与渲染诊断</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>检查项</th>
+<th>观察结果</th>
+<th>风险</th>
+<th>建议</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主内容 HTML</td>
+<td>核心 FAQ 不在初始 HTML</td>
+<td>AI 只能读取浅层摘要</td>
+<td>FAQ 和事实表 SSR/SSG 输出</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>robots</td>
+<td>未见关键页面被禁用</td>
+<td>风险较低</td>
+<td>保留公开访问，补 sitemap</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>canonical</td>
+<td>栏目页 canonical 指向自身</td>
+<td>风险较低</td>
+<td>语言版本分别声明</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>JS 依赖</td>
+<td>产品说明部分依赖客户端渲染</td>
+<td>弱渲染爬虫可能漏读</td>
+<td>关键事实不要后置渲染</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>初始 HTML</td>
+<td>导航文本占比高</td>
+<td>主内容抽取噪音增加</td>
+<td>用 <code>main</code> 和模块 ID 标记正文</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="移动端性能与可访问结构">7. 移动端、性能与可访问结构</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>维度</th>
+<th>观察</th>
+<th>风险</th>
+<th>改造建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>移动端表格</td>
+<td>参数表在窄屏可能溢出</td>
+<td>用户和爬虫预览体验差</td>
+<td>表格容器横滚，移动端改字段卡片</td>
+</tr>
+<tr>
+<td>首屏稳定</td>
+<td>首屏营销图较重</td>
+<td>LCP 可能受影响</td>
+<td>压缩图片，核心摘要先于大图输出</td>
+</tr>
+<tr>
+<td>内容懒加载</td>
+<td>FAQ 可能需要交互后加载</td>
+<td>移动优先索引可能漏内容</td>
+<td>FAQ 默认进入 HTML</td>
+</tr>
+<tr>
+<td>标题结构</td>
+<td>H2/H3 顺序基本清晰</td>
+<td>个别模块标题语义弱</td>
+<td>每页仅一个 H1，H2 描述主题</td>
+</tr>
+<tr>
+<td>链接文字</td>
+<td>存在“了解更多”类锚文本</td>
+<td>AI 难判断链接目标</td>
+<td>锚文本写清产品或问题</td>
+</tr>
+</tbody>
+</table>
+<h2 id="结构规范性与内容信号">8. 结构规范性与内容信号</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>模块</th>
+<th>当前问题</th>
+<th>GEO 影响</th>
+<th>修复方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>页面摘要</td>
+<td>缺少 80-120 字上下文无关摘要</td>
+<td>AI 引用开头不稳定</td>
+<td>首屏增加实体全称、对象、价值和边界</td>
+</tr>
+<tr>
+<td>产品事实</td>
+<td>功能点分散在段落</td>
+<td>难以切片回答</td>
+<td>增加字段化事实表</td>
+</tr>
+<tr>
+<td>服务边界</td>
+<td>未说明不适用场景</td>
+<td>答案容易过度承诺</td>
+<td>增加适用/不适用表</td>
+</tr>
+<tr>
+<td>案例证据</td>
+<td>缺少可引用客户案例</td>
+<td>信任信号不足</td>
+<td>增加案例、行业、结果和来源</td>
+</tr>
+<tr>
+<td>更新时间</td>
+<td>页面未突出更新时间</td>
+<td>新鲜度弱</td>
+<td>每个事实模块显示更新时间</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ai-可抽取性诊断">9. AI 可抽取性诊断</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>信号</th>
+<th>判断</th>
+<th>风险</th>
+<th>修复方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原子事实</td>
+<td>不足</td>
+<td>AI 难以按问题切片引用</td>
+<td>建立事实字段、值、来源表</td>
+</tr>
+<tr>
+<td>上下文无关摘要</td>
+<td>不足</td>
+<td>摘要脱离标题后意义不完整</td>
+<td>每页首屏加入 80-120 字摘要</td>
+</tr>
+<tr>
+<td>对比表</td>
+<td>缺失</td>
+<td>竞品问题易引用第三方</td>
+<td>增加对比维度和适用边界</td>
+</tr>
+<tr>
+<td>步骤内容</td>
+<td>不足</td>
+<td>“如何落地”问题缺素材</td>
+<td>增加角色、步骤、输入和输出</td>
+</tr>
+<tr>
+<td>证据质量</td>
+<td>中</td>
+<td>缺少作者、来源和更新时间</td>
+<td>补充负责人、数据来源和案例边界</td>
+</tr>
+</tbody>
+</table>
+<h2 id="schema-一致性诊断">10. Schema 一致性诊断</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>类型</th>
+<th>当前状态</th>
+<th>风险</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organization</td>
+<td>可建立品牌实体</td>
+<td>sameAs 和官方资料不足</td>
+<td>增加官网、百科、社媒和联系页</td>
+</tr>
+<tr>
+<td>WebPage</td>
+<td>可描述页面</td>
+<td>摘要字段弱</td>
+<td>与页面摘要保持一致</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>字段不完整</td>
+<td>功能和价格边界难回溯</td>
+<td>先补正文事实，再补 schema</td>
+</tr>
+<tr>
+<td>FAQPage</td>
+<td>FAQ 正文不足</td>
+<td>schema 可能脱离用户可见内容</td>
+<td>FAQ 必须页面可见</td>
+</tr>
+<tr>
+<td>BreadcrumbList</td>
+<td>部分页面缺失</td>
+<td>层级关系弱</td>
+<td>栏目和详情页补面包屑</td>
+</tr>
+</tbody>
+</table>
+<h2 id="代码层修复清单">11. 代码层修复清单</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>问题</th>
+<th>证据与影响</th>
+<th>修复动作</th>
+<th>负责人</th>
+<th>成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAQ 依赖客户端渲染</td>
+<td>初始 HTML 缺少 FAQ 文本，AI 难以抽取问答</td>
+<td>将 FAQ 列表 SSR/SSG 到 HTML；验收用 <code>curl</code> 检索 FAQ</td>
+<td>前端</td>
+<td>M</td>
+</tr>
+<tr>
+<td>schema 缺少正文支撑</td>
+<td><code>priceRange</code> 未在正文出现，可能不一致</td>
+<td>先补价格获取方式，再保留 schema 字段</td>
+<td>SEO + 内容</td>
+<td>S</td>
+</tr>
+<tr>
+<td>宽表移动端溢出</td>
+<td>参数表窄屏可能裁切</td>
+<td>表格容器横滚，Word 拆成字段卡片</td>
+<td>前端</td>
+<td>S</td>
+</tr>
+<tr>
+<td>主内容边界弱</td>
+<td>导航和正文混在同一抽取层</td>
+<td>增加 <code>main</code>、<code>article</code>、模块 ID</td>
+<td>前端</td>
+<td>S</td>
+</tr>
+<tr>
+<td>sitemap 入口弱</td>
+<td>未突出重要页面</td>
+<td>robots 中补 sitemap index</td>
+<td>SEO 工程</td>
+<td>S</td>
+</tr>
+</tbody>
+</table>
+<h2 id="内容结构改造建议">12. 内容结构改造建议</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>页面</th>
+<th>建议新增模块</th>
+<th>模块目标</th>
+<th>示例字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首页</td>
+<td>品牌事实卡</td>
+<td>让 AI 一次抽取品牌定义</td>
+<td>公司名、平台类型、对象、产品线</td>
+</tr>
+<tr>
+<td>一级页</td>
+<td>产品矩阵表</td>
+<td>区分不同产品模块</td>
+<td>产品名、场景、角色、边界</td>
+</tr>
+<tr>
+<td>二级页</td>
+<td>功能步骤表</td>
+<td>支撑“怎么使用”问题</td>
+<td>步骤、输入、输出、责任人</td>
+</tr>
+<tr>
+<td>全站</td>
+<td>FAQ 模块</td>
+<td>支撑公开答案素材</td>
+<td>问题、答案、更新时间、来源</td>
+</tr>
+<tr>
+<td>案例页</td>
+<td>证据模块</td>
+<td>提升引用可信度</td>
+<td>行业、问题、方案、结果</td>
+</tr>
+</tbody>
+</table>
+<h2 id="schema-与-html-模块建议">13. Schema 与 HTML 模块建议</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">main</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;main-content&quot;</span><span class="ot"> data-geo-main</span><span class="op">=</span><span class="st">&quot;true&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">section</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;geo-summary&quot;</span><span class="ot"> aria-labelledby</span><span class="op">=</span><span class="st">&quot;geo-summary-title&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;geo-summary-title&quot;</span><span class="dt">&gt;</span>页面摘要<span class="dt">&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>示例云服是面向 B2B 制造企业的订单协同平台，帮助销售、计划和生产团队同步订单进度、交付风险和客户沟通记录。<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">section</span><span class="dt">&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">main</span><span class="dt">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;@context&quot;</span><span class="fu">:</span> <span class="st">&quot;https://schema.org&quot;</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;@type&quot;</span><span class="fu">:</span> <span class="st">&quot;FAQPage&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;mainEntity&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;@type&quot;</span><span class="fu">:</span> <span class="st">&quot;Question&quot;</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;示例云服适合哪些企业？&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;acceptedAnswer&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;@type&quot;</span><span class="fu">:</span> <span class="st">&quot;Answer&quot;</span><span class="fu">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;示例云服适合需要统一订单进度、生产计划和客户沟通记录的 B2B 制造企业。&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="优先级路线图">14. 优先级路线图</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>批次</th>
+<th>目标</th>
+<th>关键动作</th>
+<th>验收方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 周</td>
+<td>P0 可读性</td>
+<td>FAQ、摘要、服务边界进入 HTML</td>
+<td><code>curl</code> 可检索关键问答</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>P0 一致性</td>
+<td>schema 与正文逐字段对齐</td>
+<td>Rich Results Test 无关键错误</td>
+</tr>
+<tr>
+<td>第 3 周</td>
+<td>P1 结构化</td>
+<td>增加事实表、对比表、步骤表</td>
+<td>页面出现可读表格</td>
+</tr>
+<tr>
+<td>第 4 周</td>
+<td>P1 公开素材</td>
+<td>增加中文 FAQ 和帮助中心入口</td>
+<td>高频问题有官方素材</td>
+</tr>
+</tbody>
+</table>
+<h2 id="验收命令">15. 验收命令</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">PAGE_URL</span><span class="op">=</span><span class="st">&quot;https://www.example.com/&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> <span class="st">&quot;</span><span class="va">$PAGE_URL</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="ex">rg</span> <span class="st">&quot;页面摘要|FAQ|服务边界&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> <span class="st">&quot;</span><span class="va">$PAGE_URL</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="ex">rg</span> <span class="st">&quot;application/ld</span><span class="dt">\\</span><span class="st">+json|BreadcrumbList&quot;</span></span></code></pre></div>
+<h2 id="完整性自检">16. 完整性自检</h2>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>四件套同源</td>
+<td>Markdown 为单一内容源，HTML、Word、PDF 从该文件生成</td>
+</tr>
+<tr>
+<td>权威证据台账</td>
+<td>已包含观察、标准和研究层级</td>
+</tr>
+<tr>
+<td>诊断维度</td>
+<td>覆盖抓取、渲染、移动、结构、内容、AI、schema、证据</td>
+</tr>
+<tr>
+<td>Word 宽表</td>
+<td>表格最多 5 列</td>
+</tr>
+<tr>
+<td>长 URL</td>
+<td>可见 URL 使用超链接文字或变量</td>
+</tr>
+<tr>
+<td>HTML 菜单</td>
+<td>独立 HTML 带固定目录菜单</td>
+</tr>
+<tr>
+<td>PDF 渲染</td>
+<td>A4 页面，右边缘安全带无贴边</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
