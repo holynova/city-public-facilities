@@ -4,8 +4,94 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#10223c" />
-    <meta name="description" content="近邻的功能、城市覆盖范围与已发布公共设施数据量。" />
-    <title>功能介绍 | 近邻</title>
+    <meta name="description" content="了解近邻城市公共设施检索的覆盖城市、数据来源、GCJ-02 直线距离算法、手动更新方式、使用边界与常见问题。" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://holynova.github.io/city-public-facilities/about.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="近邻" />
+    <meta property="og:title" content="数据方法与功能介绍 | 近邻" />
+    <meta property="og:description" content="近邻的覆盖范围、数据形成方式、距离算法、更新方式与使用边界。" />
+    <meta property="og:url" content="https://holynova.github.io/city-public-facilities/about.html" />
+    <meta property="og:image" content="https://holynova.github.io/city-public-facilities/assets/screenshot.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>数据方法与功能介绍 | 近邻</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "@id": "https://holynova.github.io/city-public-facilities/about.html#page",
+        "url": "https://holynova.github.io/city-public-facilities/about.html",
+        "name": "近邻的数据方法与功能介绍",
+        "description": "介绍近邻的城市覆盖、数据形成方式、直线距离算法、更新方式与使用边界。",
+        "inLanguage": "zh-CN",
+        "dateModified": "2026-08-23",
+        "isPartOf": {
+          "@id": "https://holynova.github.io/city-public-facilities/#website"
+        },
+        "about": {
+          "@id": "https://holynova.github.io/city-public-facilities/#application"
+        },
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "近邻目前支持哪些城市？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "当前发布快照覆盖上海、北京、杭州、广州、深圳、苏州、合肥、南京、成都、重庆、武汉、西安、芜湖和珠海，共 14 个城市。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "“最近”是否等于步行或驾车距离最短？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不是。近邻按 GCJ-02 坐标计算直线距离，不考虑道路、出入口、交通方式和实时路况。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "查询结果是实时数据吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不是。设施清单是按需人工更新的静态快照；地址解析在查询时进行，但设施名称、分类与状态可能发生变化。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "医院等级和学校属性可以直接作为官方结论吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不可以。相关分类用于查找候选地点，不能替代卫生健康、教育等主管部门或场所官方发布的信息。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "如何报告错误或补充地点？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "可前往项目的 GitHub 仓库提交 Issue，并提供城市、地点名称、可核验来源和需要修正的字段。"
+            }
+          }
+        ],
+        "breadcrumb": {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "近邻首页",
+              "item": "https://holynova.github.io/city-public-facilities/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "数据方法与功能介绍"
+            }
+          ]
+        }
+      }
+    </script>
     <script
       defer
       src="https://cloud.umami.is/script.js"
@@ -31,13 +117,13 @@
     <main id="main-content" class="about-main">
       <section class="about-intro" aria-labelledby="about-title">
         <p class="section-code">ABOUT / 01</p>
-        <h1 id="about-title">找到城市里离你最近的公共设施</h1>
-        <p>输入地址或使用当前位置，近邻会按大组计算直线距离，并列出每个细分类别最近的三个地点。</p>
+        <h1 id="about-title">近邻：城市公共设施近邻检索</h1>
+        <p>输入地址或使用当前位置，近邻会按大组计算直线距离，并列出每个细分类别最近的三个地点。本页说明数据如何形成、多久更新，以及结果适合和不适合做什么。</p>
       </section>
 
       <section class="network-summary" aria-label="数据覆盖概览">
-        <div class="summary-cell"><strong id="city-total">9</strong><span>已覆盖城市</span></div>
-        <div class="summary-cell"><strong id="facility-total">加载中</strong><span>已发布地点</span></div>
+        <div class="summary-cell"><strong id="city-total">14</strong><span>已覆盖城市</span></div>
+        <div class="summary-cell"><strong id="facility-total">28,588</strong><span>当前快照地点</span></div>
       </section>
 
       <section class="about-section" aria-labelledby="city-data-title">
@@ -46,10 +132,23 @@
             <p class="section-code">DATA / 02</p>
             <h2 id="city-data-title">各城市数据量</h2>
           </div>
-          <p>实时读取已发布目录</p>
+          <p>读取当前发布的数据快照</p>
         </div>
         <ol id="city-board" class="city-board" aria-live="polite">
-          <li class="city-row is-loading"><span class="city-index">--</span><span class="city-name">正在读取城市数据</span><span class="city-count" aria-hidden="true"></span></li>
+          <li class="city-row"><span class="city-index">01</span><span class="city-name">上海</span><span class="city-count">2,790<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">02</span><span class="city-name">北京</span><span class="city-count">2,489<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">03</span><span class="city-name">杭州</span><span class="city-count">2,212<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">04</span><span class="city-name">广州</span><span class="city-count">2,356<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">05</span><span class="city-name">深圳</span><span class="city-count">1,844<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">06</span><span class="city-name">苏州</span><span class="city-count">2,131<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">07</span><span class="city-name">合肥</span><span class="city-count">1,726<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">08</span><span class="city-name">南京</span><span class="city-count">2,094<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">09</span><span class="city-name">成都</span><span class="city-count">2,281<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">10</span><span class="city-name">重庆</span><span class="city-count">2,203<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">11</span><span class="city-name">武汉</span><span class="city-count">1,957<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">12</span><span class="city-name">西安</span><span class="city-count">2,024<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">13</span><span class="city-name">芜湖</span><span class="city-count">1,315<small>条</small></span></li>
+          <li class="city-row"><span class="city-index">14</span><span class="city-name">珠海</span><span class="city-count">1,166<small>条</small></span></li>
         </ol>
       </section>
 
@@ -64,10 +163,35 @@
         </ol>
       </section>
 
-      <section class="about-section" aria-labelledby="scope-title">
+      <section id="data-method" class="about-section" aria-labelledby="scope-title">
         <p class="section-code">SCOPE / 04</p>
-        <h2 id="scope-title">数据说明</h2>
-        <p class="data-scope">地点坐标采用 GCJ-02。距离为两点间直线距离，只适合初步比较，不代表实际步行或驾车路线。医院等级来自关键词候选；大学目录依据高德高等院校分类筛选，均需以主管部门公布信息为准。</p>
+        <h2 id="scope-title">数据方法与使用边界</h2>
+        <div class="method-grid">
+          <article><h3>数据从哪里来</h3><p>项目以公开目录和高德地图地点数据整理城市设施清单。地图数据用于补充名称、地址和 GCJ-02 坐标；具体分类仍应以主管部门或场所公告为准。</p></article>
+          <article><h3>距离怎么算</h3><p>查询地址先由高德地图解析为坐标，再计算查询点与设施之间的球面直线距离。结果不包含道路、入口、交通方式或实时路况。</p></article>
+          <article><h3>数据多久更新</h3><p>网站展示的是按需人工更新并发布的静态数据快照，不是实时设施数据库。页面加载时读取当前发布版本，不代表场所此刻仍开放。</p></article>
+          <article><h3>结果如何核验</h3><p>医院等级、学校属性、开放时间、服务范围和场所状态等关键信息，应在出行或决策前向主管部门、运营方或场所官方渠道复核。</p></article>
+        </div>
+        <p class="data-scope">已知边界：地点坐标采用 GCJ-02；距离为直线距离；每个细分类别默认返回最近三处；医院等级候选和高校分类不能替代主管部门认定。项目不提供路线规划、实时营业状态或官方资格证明。</p>
+      </section>
+
+      <section class="about-section" aria-labelledby="faq-title">
+        <p class="section-code">FAQ / 05</p>
+        <h2 id="faq-title">常见问题</h2>
+        <div class="faq-list">
+          <details><summary>近邻目前支持哪些城市？</summary><p>当前发布快照覆盖上海、北京、杭州、广州、深圳、苏州、合肥、南京、成都、重庆、武汉、西安、芜湖和珠海，共 14 个城市。</p></details>
+          <details><summary>“最近”是否等于步行或驾车距离最短？</summary><p>不是。近邻按 GCJ-02 坐标计算直线距离，不考虑道路、出入口、交通方式和实时路况。</p></details>
+          <details><summary>查询结果是实时数据吗？</summary><p>不是。设施清单是按需人工更新的静态快照；地址解析在查询时进行，但设施名称、分类与状态可能发生变化。</p></details>
+          <details><summary>医院等级和学校属性可以直接作为官方结论吗？</summary><p>不可以。相关分类用于查找候选地点，不能替代卫生健康、教育等主管部门或场所官方发布的信息。</p></details>
+          <details><summary>如何报告错误或补充地点？</summary><p>可前往项目的 GitHub 仓库提交 Issue，并提供城市、地点名称、可核验来源和需要修正的字段。</p></details>
+        </div>
+      </section>
+
+      <section class="about-section" aria-labelledby="maintain-title">
+        <p class="section-code">MAINTAIN / 06</p>
+        <h2 id="maintain-title">维护与责任</h2>
+        <p class="maintain-copy">近邻是公开源代码项目。页面方法说明最后修订于 <time datetime="2026-08-23">2026 年 8 月 23 日</time>。数据纠错、来源补充与代码改进均通过 GitHub 仓库留痕。</p>
+        <p class="source-links"><a href="https://github.com/holynova/city-public-facilities" target="_blank" rel="noreferrer">查看源代码与问题反馈</a></p>
         <a class="about-action" href="./">开始查询附近设施</a>
       </section>
     </main>
