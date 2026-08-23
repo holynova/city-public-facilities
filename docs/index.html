@@ -4,7 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#10223c" />
-    <title>近邻 | 城市公共设施检索</title>
+    <meta name="description" content="近邻提供北京、上海、广州、深圳等 14 个城市的公共设施近邻检索，按地址或当前位置查找各类别最近地点。结果采用 GCJ-02 坐标和直线距离，仅供出行初筛。" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://holynova.github.io/city-public-facilities/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="近邻" />
+    <meta property="og:title" content="近邻 | 城市公共设施近邻检索" />
+    <meta property="og:description" content="输入地址或使用当前位置，在 14 个已覆盖城市中查找各类最近公共设施。" />
+    <meta property="og:url" content="https://holynova.github.io/city-public-facilities/" />
+    <meta property="og:image" content="https://holynova.github.io/city-public-facilities/assets/screenshot.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>近邻 | 城市公共设施近邻检索</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://holynova.github.io/city-public-facilities/#website",
+            "url": "https://holynova.github.io/city-public-facilities/",
+            "name": "近邻",
+            "alternateName": "城市公共设施近邻检索",
+            "description": "按地址或当前位置查找已覆盖城市中各类别最近的公共设施。",
+            "inLanguage": "zh-CN",
+            "sameAs": "https://github.com/holynova/city-public-facilities"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://holynova.github.io/city-public-facilities/#application",
+            "url": "https://holynova.github.io/city-public-facilities/",
+            "name": "近邻",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "任何支持现代网页浏览器的操作系统",
+            "browserRequirements": "需要启用 JavaScript；地址解析依赖高德地图服务",
+            "isAccessibleForFree": true,
+            "inLanguage": "zh-CN",
+            "description": "覆盖 14 个中国城市的公共设施近邻检索工具，按细分类别显示最近三处地点。",
+            "featureList": [
+              "按地址或当前位置查找附近公共设施",
+              "按教育、交通、文化艺术、医疗健康等大组筛选",
+              "按细分类别展示最近三处地点",
+              "生成可分享的查询结果长图"
+            ],
+            "isPartOf": {
+              "@id": "https://holynova.github.io/city-public-facilities/#website"
+            }
+          }
+        ]
+      }
+    </script>
     <script
       defer
       src="https://cloud.umami.is/script.js"
@@ -34,7 +83,14 @@
             <div class="city-picker-meta"><span>当前城市</span><strong id="active-city-label">上海</strong></div>
             <label class="city-select-wrap">
               <span class="sr-only">切换城市</span>
-              <select id="city-select" name="city" aria-label="切换城市"></select>
+              <select id="city-select" name="city" aria-label="切换城市">
+                <optgroup label="华东"><option value="shanghai" selected>上海</option><option value="hangzhou">杭州</option><option value="suzhou">苏州</option><option value="hefei">合肥</option><option value="nanjing">南京</option><option value="wuhu">芜湖</option></optgroup>
+                <optgroup label="华北"><option value="beijing">北京</option></optgroup>
+                <optgroup label="华南"><option value="guangzhou">广州</option><option value="shenzhen">深圳</option><option value="zhuhai">珠海</option></optgroup>
+                <optgroup label="西南"><option value="chengdu">成都</option><option value="chongqing">重庆</option></optgroup>
+                <optgroup label="华中"><option value="wuhan">武汉</option></optgroup>
+                <optgroup label="西北"><option value="xian">西安</option></optgroup>
+              </select>
             </label>
           </div>
         </div>
@@ -59,22 +115,38 @@
         </div>
       </section>
 
+      <section class="project-facts" aria-labelledby="project-facts-title">
+        <div class="project-facts-head">
+          <p class="section-code">FACTS / 01</p>
+          <h2 id="project-facts-title">近邻是什么</h2>
+          <p>近邻是一款城市公共设施近邻检索工具。当前发布的数据快照覆盖 14 个城市、28,588 处地点。</p>
+        </div>
+        <dl class="fact-grid">
+          <div><dt>怎么查询</dt><dd>输入地址或允许浏览器读取当前位置，再选择已支持的城市。</dd></div>
+          <div><dt>怎么排序</dt><dd>使用 GCJ-02 坐标计算两点间直线距离，不代表步行或驾车路线。</dd></div>
+          <div><dt>返回什么</dt><dd>按八个大组整理结果，每个细分类别默认显示最近三处地点。</dd></div>
+          <div><dt>如何使用</dt><dd>结果只适合出行初筛；名称、等级和开放状态应以主管部门或场所公告为准。</dd></div>
+        </dl>
+        <p class="facts-link"><a href="about.html#data-method">查看数据方法、更新方式与使用边界</a></p>
+      </section>
+
       <section class="results" id="results" aria-live="polite" aria-busy="false">
         <div class="result-bar">
           <div class="result-heading">
             <h2>最近地点</h2>
             <button id="open-share" class="share-trigger" type="button" hidden>分享结果</button>
           </div>
-          <p id="status">正在加载地点目录</p>
+          <p id="status">当前上海目录收录 2,790 处地点，加载后即可查询</p>
         </div>
         <div class="results-layout">
           <nav id="category-nav" class="category-nav" aria-label="按结果大组筛选" hidden></nav>
           <div id="result-content" class="empty-state">
-            <h3>加载地点目录中</h3>
-            <p>目录加载完成后即可搜索地址。</p>
+            <h3>输入地址开始查找</h3>
+            <p>上海目录当前收录 2,790 处地点，每个细分类别显示最近三处。</p>
           </div>
         </div>
       </section>
+      <noscript><p class="noscript-note">近邻需要 JavaScript 来解析地址并计算距离。你仍可在功能介绍页查看城市覆盖、数据方法与使用边界。</p></noscript>
     </main>
 
     <footer id="data-note">数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛</footer>
