@@ -81,17 +81,15 @@
           <p>选择城市，输入地址，按大组找到最近的公共设施。</p>
           <div id="city-switch" class="city-picker" role="group" aria-label="选择城市">
             <div class="city-picker-meta"><span>当前城市</span><strong id="active-city-label">上海</strong></div>
-            <label class="city-select-wrap">
-              <span class="sr-only">切换城市</span>
-              <select id="city-select" name="city" aria-label="切换城市">
-                <optgroup label="华东"><option value="shanghai" selected>上海</option><option value="hangzhou">杭州</option><option value="suzhou">苏州</option><option value="hefei">合肥</option><option value="nanjing">南京</option><option value="wuhu">芜湖</option></optgroup>
-                <optgroup label="华北"><option value="beijing">北京</option></optgroup>
-                <optgroup label="华南"><option value="guangzhou">广州</option><option value="shenzhen">深圳</option><option value="zhuhai">珠海</option></optgroup>
-                <optgroup label="西南"><option value="chengdu">成都</option><option value="chongqing">重庆</option></optgroup>
-                <optgroup label="华中"><option value="wuhan">武汉</option></optgroup>
-                <optgroup label="西北"><option value="xian">西安</option></optgroup>
-              </select>
-            </label>
+            <div id="city-select-wrap" class="city-select-wrap">
+              <span id="city-select-label" class="sr-only">切换城市</span>
+              <button id="city-select-trigger" class="city-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="city-options" aria-labelledby="city-select-label city-select-value">
+                <span id="city-select-value">上海</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+              </button>
+              <div id="city-options" class="city-options" role="listbox" aria-labelledby="city-select-label" hidden></div>
+              <input id="city-select" name="city" type="hidden" value="shanghai" />
+            </div>
           </div>
         </div>
       </section>

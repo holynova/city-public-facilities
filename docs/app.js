@@ -9,6 +9,10 @@ const shareButton = document.querySelector("#open-share");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
+const citySelectWrap = document.querySelector("#city-select-wrap");
+const citySelectTrigger = document.querySelector("#city-select-trigger");
+const citySelectValue = document.querySelector("#city-select-value");
+const cityOptions = document.querySelector("#city-options");
 const citySelect = document.querySelector("#city-select");
 const activeCityLabel = document.querySelector("#active-city-label");
 const dataNote = document.querySelector("#data-note");
@@ -87,7 +91,59 @@ form.addEventListener("submit", (event) => {
   searchNearby(addressInput.value.trim());
 });
 
-citySelect.addEventListener("change", () => switchCity(citySelect.value));
+citySelectTrigger.addEventListener("click", () => {
+  if (cityOptions.hidden) openCityMenu();
+  else closeCityMenu();
+});
+
+citySelectTrigger.addEventListener("keydown", (event) => {
+  if (!["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) return;
+  event.preventDefault();
+  if (cityOptions.hidden) openCityMenu(event.key === "ArrowUp" ? "last" : "selected");
+});
+
+cityOptions.addEventListener("click", (event) => {
+  const option = event.target.closest(".city-option");
+  if (!option) return;
+  switchCity(option.dataset.city);
+  closeCityMenu();
+  citySelectTrigger.focus();
+});
+
+cityOptions.addEventListener("keydown", (event) => {
+  const options = [...cityOptions.querySelectorAll(".city-option")];
+  const currentIndex = options.indexOf(document.activeElement);
+  if (!options.length || currentIndex < 0) return;
+  let nextIndex = currentIndex;
+  if (event.key === "ArrowDown") nextIndex = (currentIndex + 1) % options.length;
+  else if (event.key === "ArrowUp") nextIndex = (currentIndex - 1 + options.length) % options.length;
+  else if (event.key === "Home") nextIndex = 0;
+  else if (event.key === "End") nextIndex = options.length - 1;
+  else if (event.key === "Escape") {
+    event.preventDefault();
+    closeCityMenu();
+    citySelectTrigger.focus();
+    return;
+  } else if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    switchCity(options[currentIndex].dataset.city);
+    closeCityMenu();
+    citySelectTrigger.focus();
+    return;
+  } else return;
+  event.preventDefault();
+  options[nextIndex].focus();
+});
+
+document.addEventListener("click", (event) => {
+  if (!citySelectWrap.contains(event.target)) closeCityMenu();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || cityOptions.hidden) return;
+  closeCityMenu();
+  citySelectTrigger.focus();
+});
 
 historyItems.addEventListener("click", (event) => {
   const target = event.target.closest("button[data-address]");
@@ -152,6 +208,7 @@ function initialCity() {
 
 function switchCity(city) {
   if (!Object.hasOwn(CITIES, city)) return;
+  if (city === activeCity) return;
   activeCity = city;
   const url = new URL(window.location.href);
   url.searchParams.set("city", city);
@@ -167,7 +224,7 @@ function applyCityUi(city) {
   addressInput.placeholder = `例如：${cityConfig.example}`;
   dataNote.textContent = `${cityConfig.name}数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛`;
   shareKicker.textContent = `${cityConfig.name}公共设施近邻检索`;
-  citySelect.value = city;
+  updateCityPicker(city);
   activeCityLabel.textContent = cityConfig.name;
   restartMotion(activeCityLabel, "is-updated");
 }
@@ -185,10 +242,35 @@ function renderCityOptions() {
     cities.push({ slug, ...city });
     regions.set(city.region, cities);
   });
-  citySelect.innerHTML = [...regions.entries()]
+  cityOptions.innerHTML = [...regions.entries()]
     .filter(([, cities]) => cities.length > 0)
-    .map(([region, cities]) => `<optgroup label="${escapeHtml(region)}">${cities.map((city) => `<option value="${city.slug}">${escapeHtml(city.name)}</option>`).join("")}</optgroup>`)
+    .map(([region, cities]) => `<div class="city-region"><p class="city-region-label">${escapeHtml(region)}</p>${cities.map((city) => `<button class="city-option" type="button" role="option" aria-selected="false" data-city="${city.slug}">${escapeHtml(city.name)}</button>`).join("")}</div>`)
     .join("");
+}
+
+function updateCityPicker(city) {
+  citySelect.value = city;
+  citySelectValue.textContent = CITIES[city].name;
+  citySelectTrigger.setAttribute("aria-label", `切换城市，当前${CITIES[city].name}`);
+  cityOptions.querySelectorAll(".city-option").forEach((option) => {
+    option.setAttribute("aria-selected", String(option.dataset.city === city));
+  });
+}
+
+function openCityMenu(focusTarget = "selected") {
+  cityOptions.hidden = false;
+  citySelectTrigger.setAttribute("aria-expanded", "true");
+  const options = [...cityOptions.querySelectorAll(".city-option")];
+  if (!options.length) return;
+  const selected = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
+  const index = focusTarget === "last" ? options.length - 1 : selected >= 0 ? selected : 0;
+  options[index].focus();
+}
+
+function closeCityMenu() {
+  if (cityOptions.hidden) return;
+  cityOptions.hidden = true;
+  citySelectTrigger.setAttribute("aria-expanded", "false");
 }
 
 async function searchNearby(address) {
