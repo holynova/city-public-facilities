@@ -87,7 +87,15 @@
                 <span id="city-select-value">上海</span>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
               </button>
-              <div id="city-options" class="city-options" role="listbox" aria-labelledby="city-select-label" hidden></div>
+              <div id="city-options-panel" class="city-options" hidden>
+                <label class="city-search">
+                  <span class="sr-only">搜索城市或地区</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 4.5 4.5"></path></svg>
+                  <input id="city-search" type="search" autocomplete="off" spellcheck="false" placeholder="搜索城市或地区" aria-label="搜索城市或地区" aria-controls="city-options" />
+                </label>
+                <div id="city-options" class="city-option-list" role="listbox" aria-labelledby="city-select-label"></div>
+                <p id="city-empty" class="city-empty" role="status" hidden>没有匹配的城市</p>
+              </div>
               <input id="city-select" name="city" type="hidden" value="shanghai" />
             </div>
           </div>

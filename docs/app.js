@@ -12,7 +12,10 @@ const currentLocationButton = document.querySelector("#current-location");
 const citySelectWrap = document.querySelector("#city-select-wrap");
 const citySelectTrigger = document.querySelector("#city-select-trigger");
 const citySelectValue = document.querySelector("#city-select-value");
+const cityOptionsPanel = document.querySelector("#city-options-panel");
+const citySearchInput = document.querySelector("#city-search");
 const cityOptions = document.querySelector("#city-options");
+const cityEmpty = document.querySelector("#city-empty");
 const citySelect = document.querySelector("#city-select");
 const activeCityLabel = document.querySelector("#active-city-label");
 const dataNote = document.querySelector("#data-note");
@@ -92,26 +95,44 @@ form.addEventListener("submit", (event) => {
 });
 
 citySelectTrigger.addEventListener("click", () => {
-  if (cityOptions.hidden) openCityMenu();
+  if (cityOptionsPanel.hidden) openCityMenu();
   else closeCityMenu();
 });
 
 citySelectTrigger.addEventListener("keydown", (event) => {
   if (!["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) return;
   event.preventDefault();
-  if (cityOptions.hidden) openCityMenu(event.key === "ArrowUp" ? "last" : "selected");
+  if (cityOptionsPanel.hidden) openCityMenu(event.key === "ArrowUp" ? "last" : "search");
+});
+
+citySearchInput.addEventListener("input", () => filterCityOptions(citySearchInput.value));
+
+citySearchInput.addEventListener("keydown", (event) => {
+  const options = visibleCityOptions();
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeCityMenu();
+    citySelectTrigger.focus();
+  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    if (!options.length) return;
+    event.preventDefault();
+    const selected = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
+    const index = event.key === "ArrowUp" ? options.length - 1 : selected >= 0 ? selected : 0;
+    options[index].focus();
+  } else if (event.key === "Enter" && options.length === 1) {
+    event.preventDefault();
+    selectCityOption(options[0]);
+  }
 });
 
 cityOptions.addEventListener("click", (event) => {
   const option = event.target.closest(".city-option");
   if (!option) return;
-  switchCity(option.dataset.city);
-  closeCityMenu();
-  citySelectTrigger.focus();
+  selectCityOption(option);
 });
 
 cityOptions.addEventListener("keydown", (event) => {
-  const options = [...cityOptions.querySelectorAll(".city-option")];
+  const options = visibleCityOptions();
   const currentIndex = options.indexOf(document.activeElement);
   if (!options.length || currentIndex < 0) return;
   let nextIndex = currentIndex;
@@ -126,9 +147,7 @@ cityOptions.addEventListener("keydown", (event) => {
     return;
   } else if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
-    switchCity(options[currentIndex].dataset.city);
-    closeCityMenu();
-    citySelectTrigger.focus();
+    selectCityOption(options[currentIndex]);
     return;
   } else return;
   event.preventDefault();
@@ -140,7 +159,7 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape" || cityOptions.hidden) return;
+  if (event.key !== "Escape" || cityOptionsPanel.hidden) return;
   closeCityMenu();
   citySelectTrigger.focus();
 });
@@ -244,8 +263,9 @@ function renderCityOptions() {
   });
   cityOptions.innerHTML = [...regions.entries()]
     .filter(([, cities]) => cities.length > 0)
-    .map(([region, cities]) => `<div class="city-region"><p class="city-region-label">${escapeHtml(region)}</p>${cities.map((city) => `<button class="city-option" type="button" role="option" aria-selected="false" data-city="${city.slug}">${escapeHtml(city.name)}</button>`).join("")}</div>`)
+    .map(([region, cities]) => `<div class="city-region" data-region="${escapeHtml(region)}"><p class="city-region-label">${escapeHtml(region)}</p>${cities.map((city) => `<button class="city-option" type="button" role="option" aria-selected="false" data-city="${city.slug}">${escapeHtml(city.name)}</button>`).join("")}</div>`)
     .join("");
+  filterCityOptions("");
 }
 
 function updateCityPicker(city) {
@@ -257,20 +277,54 @@ function updateCityPicker(city) {
   });
 }
 
-function openCityMenu(focusTarget = "selected") {
-  cityOptions.hidden = false;
+function openCityMenu(focusTarget = "search") {
+  cityOptionsPanel.hidden = false;
   citySelectTrigger.setAttribute("aria-expanded", "true");
-  const options = [...cityOptions.querySelectorAll(".city-option")];
+  citySearchInput.value = "";
+  filterCityOptions("");
+  const options = visibleCityOptions();
   if (!options.length) return;
   const selected = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
-  const index = focusTarget === "last" ? options.length - 1 : selected >= 0 ? selected : 0;
-  options[index].focus();
+  if (focusTarget === "last") options[options.length - 1].focus();
+  else if (focusTarget === "selected" && selected >= 0) options[selected].focus();
+  else citySearchInput.focus();
 }
 
 function closeCityMenu() {
-  if (cityOptions.hidden) return;
-  cityOptions.hidden = true;
+  if (cityOptionsPanel.hidden) return;
+  cityOptionsPanel.hidden = true;
   citySelectTrigger.setAttribute("aria-expanded", "false");
+  citySearchInput.value = "";
+  filterCityOptions("");
+}
+
+function visibleCityOptions() {
+  return [...cityOptions.querySelectorAll(".city-option")].filter((option) => !option.hidden);
+}
+
+function filterCityOptions(query) {
+  const normalizedQuery = query.trim().toLocaleLowerCase("zh-CN");
+  let matchCount = 0;
+  cityOptions.querySelectorAll(".city-region").forEach((region) => {
+    let regionMatchCount = 0;
+    region.querySelectorAll(".city-option").forEach((option) => {
+      const city = CITIES[option.dataset.city];
+      const searchText = `${city.name} ${city.region} ${option.dataset.city}`.toLocaleLowerCase("zh-CN");
+      const matches = normalizedQuery.length === 0 || searchText.includes(normalizedQuery);
+      option.hidden = !matches;
+      if (matches) regionMatchCount += 1;
+    });
+    region.hidden = regionMatchCount === 0;
+    matchCount += regionMatchCount;
+  });
+  cityEmpty.hidden = matchCount > 0;
+  if (document.activeElement?.classList.contains("city-option") && document.activeElement.hidden) citySearchInput.focus();
+}
+
+function selectCityOption(option) {
+  switchCity(option.dataset.city);
+  closeCityMenu();
+  citySelectTrigger.focus();
 }
 
 async function searchNearby(address) {
