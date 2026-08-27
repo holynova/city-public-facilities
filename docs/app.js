@@ -25,6 +25,7 @@ const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_LIMIT = 5;
 const HISTORY_VISIBLE_LIMIT = 2;
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const CITIES = {
   shanghai: { name: "上海", region: "华东", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
   beijing: { name: "北京", region: "华北", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
@@ -126,7 +127,11 @@ categoryNav.addEventListener("click", (event) => {
   resultContent.querySelectorAll(".major-group").forEach((group) => {
     group.hidden = filter !== "all" && group.dataset.group !== filter;
   });
-  if (filter !== "all") document.querySelector(`#major-${filter}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const selectedGroup = filter === "all" ? null : document.querySelector(`#major-${filter}`);
+  if (selectedGroup) {
+    restartMotion(selectedGroup, "is-filter-revealed");
+    selectedGroup.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
+  }
 });
 
 shareButton.addEventListener("click", openShareDialog);
@@ -164,6 +169,13 @@ function applyCityUi(city) {
   shareKicker.textContent = `${cityConfig.name}公共设施近邻检索`;
   citySelect.value = city;
   activeCityLabel.textContent = cityConfig.name;
+  restartMotion(activeCityLabel, "is-updated");
+}
+
+function restartMotion(element, className) {
+  if (!element || reducedMotion.matches) return;
+  element.classList.remove(className);
+  requestAnimationFrame(() => element.classList.add(className));
 }
 
 function renderCityOptions() {
@@ -373,10 +385,10 @@ function renderPlaces(payload) {
     `<button type="button" data-filter="all" aria-pressed="true" title="显示全部分组"><span>全部</span><b>${majorGroups.length}</b></button>`,
     ...majorGroups.map((major) => `<button type="button" data-filter="${major.key}" style="--route:${major.color}" aria-pressed="false" aria-label="筛选${escapeHtml(major.label)}" title="筛选${escapeHtml(major.label)}"><span>${escapeHtml(major.shortLabel)}</span><b>${major.subgroups.length}</b></button>`),
   ].join("");
-  resultContent.className = "place-list";
-  resultContent.innerHTML = majorGroups.map((major) => {
+  resultContent.className = "place-list is-fresh";
+  resultContent.innerHTML = majorGroups.map((major, index) => {
     const count = major.subgroups.reduce((total, group) => total + group.places.length, 0);
-    return `<section class="major-group" id="${majorGroupId(major.key)}" data-group="${major.key}" style="--route:${major.color}" aria-label="${escapeHtml(major.label)}"><header class="major-heading"><div><p>结果分组</p><h3>${escapeHtml(major.label)}</h3></div><strong>${count} 个结果</strong></header>${major.subgroups.map((group) => renderSubgroup(group)).join("")}</section>`;
+    return `<section class="major-group" id="${majorGroupId(major.key)}" data-group="${major.key}" style="--route:${major.color};--motion-order:${index}" aria-label="${escapeHtml(major.label)}"><header class="major-heading"><div><p>结果分组</p><h3>${escapeHtml(major.label)}</h3></div><strong>${count} 个结果</strong></header>${major.subgroups.map((group) => renderSubgroup(group)).join("")}</section>`;
   }).join("");
 }
 
