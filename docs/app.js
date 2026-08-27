@@ -220,7 +220,7 @@ function setLoading(loading) {
     categoryNav.hidden = true;
     shareButton.hidden = true;
     resultContent.className = "loading-state";
-    resultContent.innerHTML = "<span></span><span></span><span></span><p>正在查询高德地图</p>";
+    resultContent.innerHTML = '<div class="loading-track" aria-hidden="true"><span></span><span></span><span></span></div><p class="loading-label">正在查询高德地图</p>';
   }
 }
 

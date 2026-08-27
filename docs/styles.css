@@ -167,3 +167,67 @@ html,body { overflow-x:clip; }
     animation:none;
   }
 }
+
+/* Loading uses a route-like signal in the result area; the search icon stays still. */
+.input-row button:disabled svg {
+  animation:none;
+}
+
+.loading-state {
+  gap:8px;
+  padding:12px 0 26px;
+}
+
+.loading-track {
+  position:relative;
+  display:grid;
+  grid-column:1 / -1;
+  grid-template-columns:repeat(3,14px);
+  align-items:center;
+  justify-content:space-between;
+  min-height:32px;
+  margin:0 18px;
+}
+
+.loading-track::before {
+  position:absolute;
+  right:6px;
+  left:6px;
+  top:50%;
+  height:2px;
+  content:"";
+  background:#d5ddda;
+  transform:translateY(-50%);
+}
+
+.loading-track span {
+  position:relative;
+  z-index:1;
+  width:14px;
+  height:14px;
+  border:2px solid var(--teal);
+  border-radius:50%;
+  background:var(--paper);
+  animation:loading-node 1.2s ease-in-out infinite;
+}
+
+.loading-track span:nth-child(2) { animation-delay:120ms; }
+.loading-track span:nth-child(3) { animation-delay:240ms; }
+
+.loading-label {
+  grid-column:1 / -1;
+  margin:4px 18px 0 !important;
+  color:var(--muted);
+  font-size:13px;
+}
+
+@keyframes loading-node {
+  0%,100% { opacity:.45; transform:scale(.82); }
+  50% { opacity:1; transform:scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-track span {
+    animation:none;
+  }
+}
