@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { loadFacilityIndex } from "../dist/web/facility-index.js";
+import { loadFacilityIndex } from "../.build/web/facility-index.js";
 
 const options = Object.fromEntries(process.argv.slice(2).reduce((pairs, value, index, values) => {
   if (!value.startsWith("--")) return pairs;

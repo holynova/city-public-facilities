@@ -16,12 +16,12 @@
     "node": ">=22.0.0 <23"
   },
   "scripts": {
-    "build": "tsc",
-    "build:pages": "npm run build --silent && node scripts/export-web-catalogue.mjs --city shanghai",
+    "build": "tsc --outDir .build && node scripts/build-static.mjs",
+    "build:pages": "pnpm run build && node scripts/build-pages.mjs",
     "import:beijing-metro": "node scripts/import-beijing-metro.mjs",
-    "cli": "npm run build --silent && node dist/cli.js",
-    "web": "npm run build --silent && node dist/web/server.js",
-    "check:env": "npm run build --silent && node dist/cli.js check-env",
+    "cli": "pnpm run build && node .build/cli.js",
+    "web": "pnpm run build && node .build/web/server.js",
+    "check:env": "pnpm run build && node .build/cli.js check-env",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

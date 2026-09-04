@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "city-public-facilities",
+  "compatibility_date": "2026-09-04",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [
+    {
+      "pattern": "city-public-facilities.xiaosang.cc",
+      "custom_domain": true
+    }
+  ]
+}
