@@ -478,6 +478,26 @@ const ZHUHAI_QUERIES: Query[] = [
   { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
 ];
 
+const SANHE_QUERIES: Query[] = [
+  { category: "culture.museum", keywords: "博物馆", allPages: true, accepts: typedNamed("140100", /博物馆|纪念馆|展览馆/) },
+  { category: "library.district", keywords: "图书馆", allPages: true, accepts: named(/图书馆|城市书房|阅读空间/) },
+  { category: "culture.concert_hall", keywords: "大剧院", allPages: true, accepts: named(/大剧院|剧院|文化艺术中心|艺术中心/) },
+  { category: "hospital.tertiary_a", keywords: "三级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "hospital.secondary_a", keywords: "二级甲等医院", allPages: true, accepts: typedNamed("09", /医院/) },
+  { category: "primary_care.community_center", keywords: "社区卫生服务中心", allPages: true, accepts: typedNamed("09", /社区卫生服务(中心|站|分中心)/) },
+  { category: "commerce.large_mall", keywords: "购物中心", allPages: true, accepts: typedNamed("06", /购物中心|广场|市场|超市|商场/) },
+  { category: "transport.railway_station", keywords: "燕郊站", accepts: typedNamed("150200", /燕郊站|燕郊/) },
+  { category: "transport.railway_station", keywords: "三河县站", accepts: typedNamed("150200", /三河县站|三河站/) },
+  { category: "landmark.city_landmark", keywords: "燕郊公园", accepts: named(/燕郊公园/) },
+  { category: "landmark.city_landmark", keywords: "燕郊植物园", accepts: named(/燕郊植物园/) },
+  { category: "park.major_city_park", keywords: "燕郊公园", accepts: typedNamed("11", /燕郊公园/) },
+  { category: "park.major_city_park", keywords: "燕郊植物园", accepts: typedNamed("11", /燕郊植物园/) },
+  { category: "park.major_city_park", keywords: "幸福公园", accepts: typedNamed("11", /幸福公园/) },
+  { category: "park.neighborhood_park", keywords: "口袋公园", allPages: true, accepts: typedNamed("1101", /(口袋|街心|街区|小).*公园/) },
+  { category: "community.civic_service_center", keywords: "社区文化活动中心", allPages: true, accepts: named(/社区.*文化.*(活动)?中心/) },
+  { category: "community.civic_service_center", keywords: "党群服务中心", allPages: true, accepts: named(/党群.*服务中心/) },
+];
+
 const EDUCATION_QUERIES: Query[] = [
   { category: "education.school", keywords: "小学", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/小学/)(poi) },
   { category: "education.school", keywords: "中学", allPages: true, accepts: (poi) => hasType(poi, "1412") && named(/中学|初中|高中/)(poi) },
@@ -486,7 +506,7 @@ const EDUCATION_QUERIES: Query[] = [
 ];
 
 const CITY_QUERIES: Record<string, Query[]> = Object.fromEntries(
-  Object.entries({ "上海市": [], "北京市": BEIJING_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "重庆市": CHONGQING_QUERIES, "武汉市": WUHAN_QUERIES, "西安市": XIAN_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES })
+  Object.entries({ "上海市": [], "北京市": BEIJING_QUERIES, "三河市": SANHE_QUERIES, "杭州市": HANGZHOU_QUERIES, "广州市": GUANGZHOU_QUERIES, "深圳市": SHENZHEN_QUERIES, "苏州市": SUZHOU_QUERIES, "合肥市": HEFEI_QUERIES, "南京市": NANJING_QUERIES, "成都市": CHENGDU_QUERIES, "重庆市": CHONGQING_QUERIES, "武汉市": WUHAN_QUERIES, "西安市": XIAN_QUERIES, "芜湖市": WUHU_QUERIES, "珠海市": ZHUHAI_QUERIES })
     .map(([city, queries]) => [city, [...queries, ...EDUCATION_QUERIES]]),
 );
 

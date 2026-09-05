@@ -1,6 +1,7 @@
 const CITIES = [
   ["shanghai", "上海"],
   ["beijing", "北京"],
+  ["sanhe", "三河（燕郊）"],
   ["hangzhou", "杭州"],
   ["guangzhou", "广州"],
   ["shenzhen", "深圳"],
