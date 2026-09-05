@@ -74,3 +74,12 @@ html,body { overflow-x:clip; }
 @media (hover:hover) { .city-trigger:not(:disabled):hover,.city-options button[aria-pressed="false"]:hover { background:#e8ebe9; } }
 @media (min-width:720px) { .city-options { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 @media (prefers-reduced-motion:reduce) { .city-trigger,.city-options button { transition:none; } }
+
+.place[hidden] { display:none; }
+.more-results { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:44px; margin:0 0 8px; padding:8px 12px; border:0; border-top:1px solid var(--line); color:var(--navy); background:transparent; font-size:12px; font-weight:600; cursor:pointer; transition:background-color 150ms cubic-bezier(0.2,0,0,1),color 150ms cubic-bezier(0.2,0,0,1); }
+.more-results svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; }
+.more-results[aria-expanded="true"] svg { transform:scaleY(-1); }
+.more-results:focus-visible { outline:3px solid var(--focus); outline-offset:-3px; }
+.more-results:active { background:#e8ebe9; }
+@media (hover:hover) { .more-results:hover { background:#eef0ed; } }
+@media (prefers-reduced-motion:reduce) { .more-results { transition:none; } }

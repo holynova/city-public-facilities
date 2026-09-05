@@ -40,11 +40,11 @@
             "browserRequirements": "需要启用 JavaScript；地址解析依赖高德地图服务",
             "isAccessibleForFree": true,
             "inLanguage": "zh-CN",
-            "description": "覆盖 14 个中国城市的公共设施近邻检索工具，按细分类别显示最近三处地点。",
+            "description": "覆盖 14 个中国城市的公共设施近邻检索工具，每类默认显示最近三处地点，可展开至最多十处。",
             "featureList": [
               "按地址或当前位置查找附近公共设施",
               "按教育、交通、文化艺术、医疗健康等大组筛选",
-              "按细分类别展示最近三处地点",
+              "每类默认三处，可展开至最多十处",
               "生成可分享的查询结果长图"
             ],
             "isPartOf": {
@@ -119,7 +119,7 @@
         <dl class="fact-grid">
           <div><dt>怎么查询</dt><dd>输入地址或允许浏览器读取当前位置，再选择已支持的城市。</dd></div>
           <div><dt>怎么排序</dt><dd>使用 GCJ-02 坐标计算两点间直线距离，不代表步行或驾车路线。</dd></div>
-          <div><dt>返回什么</dt><dd>按八个大组整理结果，每个细分类别默认显示最近三处地点。</dd></div>
+          <div><dt>返回什么</dt><dd>按八个大组整理结果，每个细分类别默认显示最近三处地点，可展开至最多十处。</dd></div>
           <div><dt>如何使用</dt><dd>结果只适合出行初筛；名称、等级和开放状态应以主管部门或场所公告为准。</dd></div>
         </dl>
         <p class="facts-link"><a href="about.html#data-method">查看数据方法、更新方式与使用边界</a></p>
@@ -137,7 +137,7 @@
           <nav id="category-nav" class="category-nav" aria-label="按结果大组筛选" hidden></nav>
           <div id="result-content" class="empty-state">
             <h3>输入地址开始查找</h3>
-            <p>上海目录当前收录 2,790 处地点，每个细分类别显示最近三处。</p>
+            <p>上海目录当前收录 2,790 处地点，每类默认显示最近三处，可展开至最多十处。</p>
           </div>
         </div>
       </section>

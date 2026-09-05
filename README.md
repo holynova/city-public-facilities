@@ -25,3 +25,22 @@
 查询结果仅供出行初步筛选；场所开放状态、医院等级、学校属性和服务范围等信息，请以主管部门或场所官方渠道为准。
 
 详细说明：[数据方法与使用边界](https://holynova.github.io/city-public-facilities/about.html#data-method)
+
+## 网站发布
+
+主站为 https://city-public-facilities.xiaosang.cc/，由独立的 Cloudflare Worker
+`city-public-facilities` 托管。GitHub Pages 使用 `master:/docs`，保留为备用地址。
+推送 `master` 只会更新 GitHub Pages，不会自动发布 Cloudflare。
+
+两个渠道统一使用主分支已提交的 `docs/` 静态文件。Cloudflare 发布时从已提交
+版本导出干净目录，避免上传本地设计预览、报告或其他未提交内容：
+
+```sh
+release_dir=$(mktemp -d)
+git archive HEAD docs wrangler.jsonc | tar -x -C "$release_dir"
+(cd "$release_dir" && npx wrangler@4.129.0 deploy)
+```
+
+发布后分别核对 Pages 构建提交、Worker 部署版本，以及两个域名的
+`index.html`、`app.js`、`styles.css` 和城市目录。浏览器验证城市切换、查询等待状态、
+每类默认三项以及展开/收起（最多十项）；不能仅凭 Git 推送成功就认为主站已更新。

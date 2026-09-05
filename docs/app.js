@@ -25,6 +25,8 @@ const shareAddress = document.querySelector("#share-address");
 const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
+const DEFAULT_RESULT_LIMIT = 3;
+const MAX_RESULT_LIMIT = 10;
 const HISTORY_LIMIT = 5;
 const HISTORY_VISIBLE_LIMIT = 2;
 const CITIES = {
@@ -81,7 +83,7 @@ function loadCatalogue(city) {
     if (facilities.length === 0) throw new Error("地点目录为空。");
     status.textContent = `已加载 ${facilities.length.toLocaleString("zh-CN")} 处${cityConfig.name}地点`;
     resultContent.className = "empty-state";
-    resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>按大组整理结果，每个细分类别显示最近三处地点。</p>";
+    resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>按大组整理结果，每类默认显示最近三处，可展开至最多十处。</p>";
   })
   .catch((error) => {
     if (version !== catalogueVersion) return;
@@ -124,6 +126,8 @@ document.querySelector("#city-switch").addEventListener("focusout", (event) => {
   if (!event.currentTarget.contains(event.relatedTarget)) closeCityPanel();
 });
 resultContent.addEventListener("click", (event) => {
+  const toggle = event.target.closest("[data-more-results]");
+  if (toggle) toggleMoreResults(toggle);
   if (event.target.closest("[data-retry]") && retryAction) retryAction();
 });
 function addRetry(action) {
@@ -398,7 +402,7 @@ function findNearestByCategory(catalogue, origin) {
           return true;
         })
         : ranked;
-      return { category, places: unique.slice(0, 3) };
+      return { category, places: unique.slice(0, MAX_RESULT_LIMIT) };
     });
 }
 
@@ -427,7 +431,7 @@ function haversineMeters(first, second) {
 function renderPlaces(payload) {
   const { origin, majorGroups } = payload;
   const groups = majorGroups.flatMap((major) => major.subgroups.map((group) => ({ ...group, majorKey: major.key, majorLabel: major.label })));
-  latestShare = { address: origin.formattedAddress, majorGroups, groups };
+  latestShare = { address: origin.formattedAddress, majorGroups, groups: groups.map((group) => ({ ...group, places: group.places.slice(0, DEFAULT_RESULT_LIMIT) })) };
   status.textContent = origin.formattedAddress;
   shareButton.hidden = false;
   categoryNav.hidden = false;
@@ -438,13 +442,33 @@ function renderPlaces(payload) {
   resultContent.className = "place-list";
   resultContent.innerHTML = majorGroups.map((major) => {
     const count = major.subgroups.reduce((total, group) => total + group.places.length, 0);
-    return `<section class="major-group" id="${majorGroupId(major.key)}" data-group="${major.key}" style="--route:${major.color}" aria-label="${escapeHtml(major.label)}"><header class="major-heading"><div><p>结果分组</p><h3>${escapeHtml(major.label)}</h3></div><strong>${count} 个结果</strong></header>${major.subgroups.map((group) => renderSubgroup(group)).join("")}</section>`;
+    return `<section class="major-group" id="${majorGroupId(major.key)}" data-group="${major.key}" style="--route:${major.color}" aria-label="${escapeHtml(major.label)}"><header class="major-heading"><div><p>结果分组</p><h3>${escapeHtml(major.label)}</h3></div><strong>可查看 ${count} 处</strong></header>${major.subgroups.map((group) => renderSubgroup(group)).join("")}</section>`;
   }).join("");
 }
 
 function renderSubgroup(group) {
   const meta = categoryMeta(group.category);
-  return `<section class="category-group subgroup" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p><span>${group.places.length} 处</span></header>${group.places.map((place) => `<article class="place"><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}</section>`;
+  const places = group.places.slice(0, MAX_RESULT_LIMIT);
+  const visibleCount = Math.min(DEFAULT_RESULT_LIMIT, places.length);
+  const extraIds = places.slice(DEFAULT_RESULT_LIMIT).map((_, index) => `place-${group.category}-${index + DEFAULT_RESULT_LIMIT}`);
+  const toggle = extraIds.length ? `<button class="more-results" type="button" aria-expanded="false" aria-controls="${extraIds.join(" ")}" data-more-results data-category="${group.category}"><span>再显示 ${extraIds.length} 处</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>` : "";
+  return `<section class="category-group subgroup" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p><span data-visible-count>${visibleCount}${extraIds.length ? ` / ${places.length}` : ""} 处</span></header>${places.map((place, index) => `<article class="place"${index >= DEFAULT_RESULT_LIMIT ? ` id="place-${group.category}-${index}" data-extra-place hidden` : ""}><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}${toggle}</section>`;
+}
+
+function toggleMoreResults(toggle) {
+  const subgroup = toggle.closest(".subgroup");
+  const expanding = toggle.getAttribute("aria-expanded") !== "true";
+  const extras = subgroup.querySelectorAll("[data-extra-place]");
+  extras.forEach((place) => { place.hidden = !expanding; });
+  toggle.setAttribute("aria-expanded", String(expanding));
+  toggle.querySelector("span").textContent = expanding ? "收起至 3 处" : `再显示 ${extras.length} 处`;
+  const total = subgroup.querySelectorAll(".place").length;
+  subgroup.querySelector("[data-visible-count]").textContent = `${expanding ? total : DEFAULT_RESULT_LIMIT} / ${total} 处`;
+  // Match exported images to each category's current visible selection.
+  const source = latestShare?.majorGroups.flatMap((major) => major.subgroups).find((group) => group.category === toggle.dataset.category);
+  const shared = latestShare?.groups.find((group) => group.category === toggle.dataset.category);
+  if (source && shared) shared.places = source.places.slice(0, expanding ? MAX_RESULT_LIMIT : DEFAULT_RESULT_LIMIT);
+  if (!expanding && subgroup.getBoundingClientRect().top < 108) subgroup.scrollIntoView({ block: "start", behavior: "instant" });
 }
 
 function projectUrl() {
@@ -605,7 +629,7 @@ function drawShareHeader(context, share, options) {
   context.fillStyle = "#b9c4cb";
   context.font = `400 ${metaSize}px "Noto Sans SC", sans-serif`;
   const majorCount = share.majorGroups?.length ?? share.groups.length;
-  context.fillText(`${majorCount} 个分组 · ${share.groups.length} 个细分类别 · 每类最多 3 个结果 · 直线距离`, margin, headerHeight - 58);
+  context.fillText(`${majorCount} 个分组 · ${share.groups.length} 个细分类别 · 按当前展开状态导出 · 直线距离`, margin, headerHeight - 58);
   if (qrImage) {
     const frameX = width - margin - qrFrame;
     context.fillStyle = "#ffffff";
