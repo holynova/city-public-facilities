@@ -10,6 +10,8 @@ const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
 const citySelect = document.querySelector("#city-select");
+const cityPanel = document.querySelector("#city-panel");
+const cityOptions = document.querySelector("#city-options");
 const activeCityLabel = document.querySelector("#active-city-label");
 const dataNote = document.querySelector("#data-note");
 const shareKicker = document.querySelector("#share-kicker");
@@ -26,22 +28,21 @@ const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_LIMIT = 5;
 const HISTORY_VISIBLE_LIMIT = 2;
 const CITIES = {
-  shanghai: { name: "上海", region: "华东", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
-  beijing: { name: "北京", region: "华北", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
-  hangzhou: { name: "杭州", region: "华东", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
-  guangzhou: { name: "广州", region: "华南", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
-  shenzhen: { name: "深圳", region: "华南", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
-  suzhou: { name: "苏州", region: "华东", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
-  hefei: { name: "合肥", region: "华东", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
-  nanjing: { name: "南京", region: "华东", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
-  chengdu: { name: "成都", region: "西南", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
-  chongqing: { name: "重庆", region: "西南", geocodeName: "重庆市", example: "解放碑", center: { latitude: 29.5630, longitude: 106.5516 } },
-  wuhan: { name: "武汉", region: "华中", geocodeName: "武汉市", example: "黄鹤楼", center: { latitude: 30.5928, longitude: 114.3055 } },
-  xian: { name: "西安", region: "西北", geocodeName: "西安市", example: "大雁塔", center: { latitude: 34.3416, longitude: 108.9398 } },
-  wuhu: { name: "芜湖", region: "华东", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
-  zhuhai: { name: "珠海", region: "华南", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
+  shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
+  beijing: { name: "北京", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
+  hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
+  guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
+  shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
+  suzhou: { name: "苏州", geocodeName: "苏州市", example: "拙政园", center: { latitude: 31.2989, longitude: 120.5853 } },
+  hefei: { name: "合肥", geocodeName: "合肥市", example: "包公园", center: { latitude: 31.8206, longitude: 117.2272 } },
+  nanjing: { name: "南京", geocodeName: "南京市", example: "中山陵", center: { latitude: 32.0603, longitude: 118.7969 } },
+  chengdu: { name: "成都", geocodeName: "成都市", example: "天府广场", center: { latitude: 30.5728, longitude: 104.0668 } },
+  chongqing: { name: "重庆", geocodeName: "重庆市", example: "解放碑", center: { latitude: 29.5630, longitude: 106.5516 } },
+  wuhan: { name: "武汉", geocodeName: "武汉市", example: "黄鹤楼", center: { latitude: 30.5928, longitude: 114.3055 } },
+  xian: { name: "西安", geocodeName: "西安市", example: "大雁塔", center: { latitude: 34.3416, longitude: 108.9398 } },
+  wuhu: { name: "芜湖", geocodeName: "芜湖市", example: "镜湖公园", center: { latitude: 31.3525, longitude: 118.4331 } },
+  zhuhai: { name: "珠海", geocodeName: "珠海市", example: "珠海大剧院", center: { latitude: 22.2710, longitude: 113.5767 } },
 };
-const CITY_REGION_ORDER = ["华东", "华北", "华南", "西南", "华中", "西北", "东北"];
 const MAJOR_GROUPS = [
   { key: "education", label: "教育", shortLabel: "教育", color: "#5857a6", categories: ["education.university", "education.school", "education.kindergarten"] },
   { key: "transport", label: "交通", shortLabel: "交通", color: "#009a74", categories: ["transit.metro_station", "transport.railway_station", "transport.airport"] },
@@ -57,28 +58,38 @@ let facilities = [];
 let amapReady;
 let latestShare;
 let activeCity = initialCity();
+let catalogueVersion = 0;
+let queryBusy = false;
+let retryAction;
 let catalogueReady = loadCatalogue(activeCity);
 
 function loadCatalogue(city) {
+  const version = ++catalogueVersion;
   const cityConfig = CITIES[city];
+  showLoading(`正在加载${cityConfig.name}地点…`);
   facilities = [];
   categoryNav.hidden = true;
   shareButton.hidden = true;
-  status.textContent = `正在加载${cityConfig.name}地点目录`;
-  resultContent.className = "empty-state";
-  resultContent.innerHTML = `<h3>正在准备${cityConfig.name}地点</h3><p>目录加载完成后即可搜索地址。</p>`;
   return fetch(`data/${city}.json`)
   .then((response) => {
-    if (!response.ok) throw new Error("地点目录加载失败，请刷新页面重试。");
+    if (!response.ok) throw new Error("地点目录加载失败，请重试。");
     return response.json();
   })
   .then((catalogue) => {
+    if (version !== catalogueVersion) return;
     facilities = catalogue.facilities ?? [];
     if (facilities.length === 0) throw new Error("地点目录为空。");
     status.textContent = `已加载 ${facilities.length.toLocaleString("zh-CN")} 处${cityConfig.name}地点`;
+    resultContent.className = "empty-state";
     resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>按大组整理结果，每个细分类别显示最近三处地点。</p>";
   })
-  .catch((error) => renderMessage(error instanceof Error ? error.message : "地点目录加载失败。", "error"));
+  .catch((error) => {
+    if (version !== catalogueVersion) return;
+    renderMessage(error instanceof Error ? error.message : "地点目录加载失败。", "error");
+    resultContent.querySelector("p").textContent = "请检查网络连接后重新加载。";
+    addRetry(() => { catalogueReady = loadCatalogue(activeCity); });
+  })
+  .finally(() => { if (version === catalogueVersion && !queryBusy) results.setAttribute("aria-busy", "false"); });
 }
 
 form.addEventListener("submit", (event) => {
@@ -86,7 +97,39 @@ form.addEventListener("submit", (event) => {
   searchNearby(addressInput.value.trim());
 });
 
-citySelect.addEventListener("change", () => switchCity(citySelect.value));
+function closeCityPanel(restoreFocus = false) {
+  cityPanel.hidden = true;
+  citySelect.setAttribute("aria-expanded", "false");
+  if (restoreFocus) citySelect.focus();
+}
+citySelect.addEventListener("click", () => {
+  const opening = cityPanel.hidden;
+  cityPanel.hidden = !opening;
+  citySelect.setAttribute("aria-expanded", String(opening));
+  if (opening) cityOptions.querySelector('[aria-pressed="true"]').focus();
+});
+cityOptions.addEventListener("click", (event) => {
+  const option = event.target.closest("button[data-city]");
+  if (!option) return;
+  if (option.dataset.city !== activeCity) switchCity(option.dataset.city);
+  closeCityPanel(true);
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest("#city-switch")) closeCityPanel();
+});
+document.querySelector("#city-switch").addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !cityPanel.hidden) { event.preventDefault(); closeCityPanel(true); }
+});
+document.querySelector("#city-switch").addEventListener("focusout", (event) => {
+  if (!event.currentTarget.contains(event.relatedTarget)) closeCityPanel();
+});
+resultContent.addEventListener("click", (event) => {
+  if (event.target.closest("[data-retry]") && retryAction) retryAction();
+});
+function addRetry(action) {
+  retryAction = action;
+  resultContent.insertAdjacentHTML("beforeend", '<button class="retry-button" type="button" data-retry>重试</button>');
+}
 
 historyItems.addEventListener("click", (event) => {
   const target = event.target.closest("button[data-address]");
@@ -97,19 +140,24 @@ historyItems.addEventListener("click", (event) => {
 });
 
 currentLocationButton.addEventListener("click", async () => {
+  if (queryBusy) return;
   setLocationLoading(true);
-  setLoading(true);
+  setLoading(true, "正在获取当前位置…");
   try {
     await catalogueReady;
+    if (!hasCatalogue()) return;
+    showLoading("正在获取当前位置…");
     const origin = await getCurrentLocation();
     const nearbyCity = selectNearbyCity(origin);
     if (nearbyCity !== activeCity) {
       switchCity(nearbyCity);
       await catalogueReady;
+      if (!hasCatalogue()) return;
     }
     renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
+    addRetry(() => currentLocationButton.click());
   } finally {
     setLoading(false);
     setLocationLoading(false);
@@ -162,24 +210,19 @@ function applyCityUi(city) {
   addressInput.placeholder = `例如：${cityConfig.example}`;
   dataNote.textContent = `${cityConfig.name}数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛`;
   shareKicker.textContent = `${cityConfig.name}公共设施近邻检索`;
-  citySelect.value = city;
+  citySelect.setAttribute("aria-label", `切换城市，当前${cityConfig.name}`);
+  cityOptions.querySelectorAll("button").forEach((option) => option.setAttribute("aria-pressed", String(option.dataset.city === city)));
   activeCityLabel.textContent = cityConfig.name;
 }
 
 function renderCityOptions() {
-  const regions = new Map(CITY_REGION_ORDER.map((region) => [region, []]));
-  Object.entries(CITIES).forEach(([slug, city]) => {
-    const cities = regions.get(city.region) ?? [];
-    cities.push({ slug, ...city });
-    regions.set(city.region, cities);
-  });
-  citySelect.innerHTML = [...regions.entries()]
-    .filter(([, cities]) => cities.length > 0)
-    .map(([region, cities]) => `<optgroup label="${escapeHtml(region)}">${cities.map((city) => `<option value="${city.slug}">${escapeHtml(city.name)}</option>`).join("")}</optgroup>`)
-    .join("");
+  cityOptions.innerHTML = Object.entries(CITIES)
+    .sort(([, a], [, b]) => a.name.localeCompare(b.name, "zh-CN-u-co-pinyin"))
+    .map(([slug, city]) => `<button type="button" data-city="${slug}" aria-pressed="${slug === activeCity}"><span>${escapeHtml(city.name)}</span><span class="city-check" aria-hidden="true">✓</span></button>`).join("");
 }
 
 async function searchNearby(address) {
+  if (queryBusy) return;
   if (address.length < 2) {
     renderMessage("请输入更完整的地址。", "error");
     addressInput.focus();
@@ -189,26 +232,45 @@ async function searchNearby(address) {
   setLoading(true);
   try {
     await catalogueReady;
+    if (!hasCatalogue()) return;
+    showLoading("正在查找地址…");
     const origin = await geocodeAddress(address);
     saveSearchHistory(address);
     renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "查询失败，请稍后重试。", "error");
+    addRetry(() => searchNearby(address));
   } finally {
     setLoading(false);
   }
 }
 
-function setLoading(loading) {
+function hasCatalogue() {
+  if (facilities.length) return true;
+  renderMessage("地点目录尚未就绪。", "error");
+  resultContent.querySelector("p").textContent = "请重新加载目录后查询。";
+  addRetry(() => { catalogueReady = loadCatalogue(activeCity); });
+  return false;
+}
+
+function showLoading(message) {
+  results.setAttribute("aria-busy", "true");
+  status.textContent = message;
+  categoryNav.hidden = true;
+  shareButton.hidden = true;
+  resultContent.className = "loading-state";
+  resultContent.innerHTML = `<p>请稍候，完成后会自动更新。</p><div aria-hidden="true">${Array.from({ length: 3 }, () => '<div class="skeleton-row"><div><span class="skeleton-name"></span><span class="skeleton-address"></span></div><span class="skeleton-distance"></span></div>').join("")}</div>`;
+}
+function setLoading(loading, message = "正在查找地址…") {
+  queryBusy = loading;
   results.setAttribute("aria-busy", String(loading));
   button.disabled = loading;
-  button.setAttribute("aria-label", loading ? "正在定位" : "开始查询");
+  currentLocationButton.disabled = loading;
+  citySelect.disabled = loading;
+  button.setAttribute("aria-label", loading ? message : "开始查询");
   if (loading) {
-    status.textContent = "正在定位并计算各分组最近地点";
-    categoryNav.hidden = true;
-    shareButton.hidden = true;
-    resultContent.className = "loading-state";
-    resultContent.innerHTML = "<span></span><span></span><span></span><p>正在查询高德地图</p>";
+    closeCityPanel();
+    showLoading(facilities.length ? message : `正在加载${CITIES[activeCity].name}地点…`);
   }
 }
 
@@ -679,7 +741,7 @@ function renderAlternateNames(place) {
 function renderMessage(message, type) {
   categoryNav.hidden = true;
   shareButton.hidden = true;
-  status.textContent = type === "error" ? "无法完成定位" : "输入地址后开始检索";
+  status.textContent = type === "error" ? "暂时无法完成查询" : "输入地址后开始检索";
   resultContent.className = `empty-state ${type}`;
   resultContent.innerHTML = `<h3>${escapeHtml(message)}</h3><p>请补充区、路名或门牌号后重试。</p>`;
 }
