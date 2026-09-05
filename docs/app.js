@@ -32,6 +32,7 @@ const HISTORY_VISIBLE_LIMIT = 2;
 const CITIES = {
   shanghai: { name: "上海", geocodeName: "上海市", example: "人民公园", center: { latitude: 31.2304, longitude: 121.4737 } },
   beijing: { name: "北京", geocodeName: "北京市", example: "天安门", center: { latitude: 39.9042, longitude: 116.4074 } },
+  sanhe: { name: "三河（燕郊）", aliases: ["三河", "燕郊"], geocodeName: "三河市", example: "燕郊公园", center: { latitude: 39.944446, longitude: 116.877740 } },
   hangzhou: { name: "杭州", geocodeName: "杭州市", example: "西湖", center: { latitude: 30.2741, longitude: 120.1551 } },
   guangzhou: { name: "广州", geocodeName: "广州市", example: "广州塔", center: { latitude: 23.1291, longitude: 113.2644 } },
   shenzhen: { name: "深圳", geocodeName: "深圳市", example: "深圳湾公园", center: { latitude: 22.5431, longitude: 114.0579 } },
@@ -330,7 +331,7 @@ function getCurrentLocation() {
 
 function selectNearbyCity(origin) {
   const reportedCity = String(origin.city || "").replace(/市$/, "");
-  const exactCity = Object.entries(CITIES).find(([, city]) => city.name === reportedCity)?.[0];
+  const exactCity = Object.entries(CITIES).find(([, city]) => city.name === reportedCity || city.aliases?.includes(reportedCity) || city.geocodeName.replace(/市$/, "") === reportedCity)?.[0];
   if (exactCity) return exactCity;
   const [nearestCity, distance] = Object.entries(CITIES)
     .map(([city, config]) => [city, haversineMeters(origin, config.center)])
