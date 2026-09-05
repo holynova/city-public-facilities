@@ -57,13 +57,16 @@ const MAJOR_GROUPS = [
   { key: "landmark", label: "城市地标", shortLabel: "城市地标", color: "#715bba", categories: ["landmark.city_landmark"] },
 ];
 
+const catalogueCache = new Map();
 let facilities = [];
+let allFacilities = [];
 let amapReady;
 let latestShare;
 let activeCity = initialCity();
 let catalogueVersion = 0;
 let queryBusy = false;
 let retryAction;
+let allCataloguesReady;
 let catalogueReady = loadCatalogue(activeCity);
 
 function loadCatalogue(city) {
@@ -73,16 +76,11 @@ function loadCatalogue(city) {
   facilities = [];
   categoryNav.hidden = true;
   shareButton.hidden = true;
-  return fetch(`data/${city}.json`)
-  .then((response) => {
-    if (!response.ok) throw new Error("地点目录加载失败，请重试。");
-    return response.json();
-  })
-  .then((catalogue) => {
+  return fetchCatalogue(city)
+  .then((cityFacilities) => {
     if (version !== catalogueVersion) return;
-    facilities = catalogue.facilities ?? [];
-    if (facilities.length === 0) throw new Error("地点目录为空。");
-    status.textContent = `已加载 ${facilities.length.toLocaleString("zh-CN")} 处${cityConfig.name}地点`;
+    facilities = cityFacilities;
+    updateCatalogueStatus(cityFacilities, cityConfig);
     resultContent.className = "empty-state";
     resultContent.innerHTML = "<h3>输入地址开始查找</h3><p>按大组整理结果，每类默认显示最近三处，可展开至最多十处。</p>";
   })
@@ -93,6 +91,54 @@ function loadCatalogue(city) {
     addRetry(() => { catalogueReady = loadCatalogue(activeCity); });
   })
   .finally(() => { if (version === catalogueVersion && !queryBusy) results.setAttribute("aria-busy", "false"); });
+}
+
+function fetchCatalogue(city) {
+  const cached = catalogueCache.get(city);
+  if (cached) return cached;
+  const request = fetch(`data/${city}.json`)
+    .then((response) => {
+      if (!response.ok) throw new Error(`${CITIES[city].name}地点目录加载失败，请重试。`);
+      return response.json();
+    })
+    .then((catalogue) => {
+      const cityFacilities = catalogue.facilities ?? [];
+      if (cityFacilities.length === 0) throw new Error(`${CITIES[city].name}地点目录为空。`);
+      return cityFacilities;
+    })
+    .catch((error) => {
+      catalogueCache.delete(city);
+      throw error;
+    });
+  catalogueCache.set(city, request);
+  return request;
+}
+
+function loadAllCatalogues() {
+  const request = Promise.all(Object.keys(CITIES).map((city) => fetchCatalogue(city)))
+    .then((catalogues) => {
+      allFacilities = mergeCatalogues(catalogues);
+      if (!queryBusy && !latestShare) status.textContent = `已加载 ${allFacilities.length.toLocaleString("zh-CN")} 处公共地点，可跨城市按距离查询`;
+      return allFacilities;
+    });
+  request.catch(() => {
+    if (allCataloguesReady === request) allCataloguesReady = undefined;
+  });
+  return request;
+}
+
+function ensureAllCatalogues() {
+  return allCataloguesReady ?? (allCataloguesReady = loadAllCatalogues());
+}
+
+function mergeCatalogues(catalogues) {
+  return catalogues.flat();
+}
+
+function updateCatalogueStatus(cityFacilities, cityConfig) {
+  status.textContent = allFacilities.length
+    ? `已加载 ${allFacilities.length.toLocaleString("zh-CN")} 处公共地点，可跨城市按距离查询`
+    : `已加载 ${cityFacilities.length.toLocaleString("zh-CN")} 处${cityConfig.name}地点`;
 }
 
 form.addEventListener("submit", (event) => {
@@ -159,7 +205,8 @@ currentLocationButton.addEventListener("click", async () => {
       await catalogueReady;
       if (!hasCatalogue()) return;
     }
-    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
+    await ensureAllCatalogues();
+    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(allFacilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
     addRetry(() => currentLocationButton.click());
@@ -240,8 +287,9 @@ async function searchNearby(address) {
     if (!hasCatalogue()) return;
     showLoading("正在查找地址…");
     const origin = await geocodeAddress(address);
+    await ensureAllCatalogues();
     saveSearchHistory(address);
-    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(facilities, origin) });
+    renderPlaces({ origin, majorGroups: findNearestByMajorGroup(allFacilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "查询失败，请稍后重试。", "error");
     addRetry(() => searchNearby(address));

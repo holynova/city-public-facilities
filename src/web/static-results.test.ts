@@ -6,15 +6,16 @@ const source = readFileSync(new URL("../../docs/app.js", import.meta.url), "utf8
 // Exercise the shipped classic-script functions without its browser startup.
 function declaration(name: string) {
   const start = source.indexOf(`function ${name}(`);
+  if (start < 0) return "";
   const end = source.indexOf("\nfunction ", start + 1);
   return source.slice(start, end);
 }
 const api = runInNewContext([
   ...source.matchAll(/^const (?:DEFAULT|MAX)_RESULT_LIMIT = .*;$/gm),
 ].map((match) => match[0]).join("\n") + "\n" + [
-  "findNearestByCategory", "nearestDistance", "haversineMeters", "renderSubgroup",
+  "mergeCatalogues", "findNearestByCategory", "nearestDistance", "haversineMeters", "renderSubgroup",
 ].map(declaration).join("\n") + "\n" + source.match(/^function escapeHtml.*$/m)![0] +
-  "\n({ findNearestByCategory, renderSubgroup });", {
+  "\n({ mergeCatalogues, findNearestByCategory, renderSubgroup });", {
   displayCategoryFor: (category: string) => category,
   categorySortOrder: () => 0,
   categoryMeta: () => ({ label: "公园", color: "#23834d" }),
@@ -29,6 +30,17 @@ const place = (index: number, category = "park.major_city_park") => ({
 });
 
 describe("static site expandable results", () => {
+  it("merges city catalogues before ranking nearby facilities", () => {
+    const selectedCity = place(18);
+    selectedCity.name = "选中城市地点";
+    const neighboringCity = place(1);
+    neighboringCity.name = "临近城市地点";
+    const catalogue = api.mergeCatalogues([[selectedCity], [neighboringCity]]);
+    const group = api.findNearestByCategory(catalogue, origin)[0];
+
+    expect(group.places[0].name).toBe("临近城市地点");
+  });
+
   it("keeps the ten closest candidates in distance order", () => {
     const group = api.findNearestByCategory(Array.from({ length: 14 }, (_, i) => place(14 - i)), origin)[0];
     expect(group.places.map((p: { name: string }) => p.name)).toEqual(Array.from({ length: 10 }, (_, i) => `地点${i + 1}`));
