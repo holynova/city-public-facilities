@@ -78,7 +78,7 @@
       <section class="search-deck" aria-labelledby="page-title">
         <div class="search-copy">
           <h1 id="page-title">最近地点清单</h1>
-          <p>选择城市，输入地址，按大组找到最近的公共设施。</p>
+          <p>选择城市帮助解析地址，结果会在全部城市目录中按距离排序。</p>
           <div id="city-switch" class="city-picker" role="group" aria-label="选择城市">
             <button id="city-select" class="city-trigger" type="button" aria-expanded="false" aria-controls="city-panel" aria-label="切换城市，当前上海">
               <span id="active-city-label">上海</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
@@ -117,7 +117,7 @@
           <p>近邻是一款城市公共设施近邻检索工具。当前发布的数据快照覆盖 15 个城市、28,715 处地点。</p>
         </div>
         <dl class="fact-grid">
-          <div><dt>怎么查询</dt><dd>输入地址或允许浏览器读取当前位置，再选择已支持的城市。</dd></div>
+          <div><dt>怎么查询</dt><dd>选择地址所在城市来帮助解析地址；结果会在已支持的全部城市目录中按距离比较。</dd></div>
           <div><dt>怎么排序</dt><dd>使用 GCJ-02 坐标计算两点间直线距离，不代表步行或驾车路线。</dd></div>
           <div><dt>返回什么</dt><dd>按八个大组整理结果，每个细分类别默认显示最近三处地点，可展开至最多十处。</dd></div>
           <div><dt>如何使用</dt><dd>结果只适合出行初筛；名称、等级和开放状态应以主管部门或场所公告为准。</dd></div>
@@ -131,13 +131,13 @@
             <h2>最近地点</h2>
             <button id="open-share" class="share-trigger" type="button" hidden>分享结果</button>
           </div>
-          <p id="status">当前上海目录收录 2,790 处地点，加载后即可查询</p>
+          <p id="status">已发布 15 个城市、28,715 处地点，加载后可按距离查询</p>
         </div>
         <div class="results-layout">
           <nav id="category-nav" class="category-nav" aria-label="按结果大组筛选" hidden></nav>
           <div id="result-content" class="empty-state">
             <h3>输入地址开始查找</h3>
-            <p>上海目录当前收录 2,790 处地点，每类默认显示最近三处，可展开至最多十处。</p>
+            <p>已发布目录共 28,715 处地点，查询后按距离比较，每类默认显示最近三处，可展开至最多十处。</p>
           </div>
         </div>
       </section>
