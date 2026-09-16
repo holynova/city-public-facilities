@@ -2,6 +2,11 @@
 
 输入地址，按类别查找附近的公共设施，并比较直线距离。数据为人工更新的目录快照，适合先筛选地点，再核实开放与服务信息。
 
+<p align="center">
+  <img src="assets/readme/hero.svg" width="100%" alt="近邻: 输入地址，按类别查找附近的公共设施，并比较直线距离。数据为人工更新的目录快照，适合先筛选地点，再核实开放与服务信息。">
+</p>
+
+
 ## 🚀 在线 Demo
 
 ### [👉 立即打开近邻，查询附近的公共设施](https://holynova.github.io/city-public-facilities/)
