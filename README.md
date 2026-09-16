@@ -1,5 +1,12 @@
 # 近邻
 
+输入地址，按类别查找附近的公共设施，并比较直线距离。数据为人工更新的目录快照，适合先筛选地点，再核实开放与服务信息。
+
+<p align="center">
+  <img src="assets/readme/hero.svg" width="100%" alt="近邻: 输入地址，按类别查找附近的公共设施，并比较直线距离。数据为人工更新的目录快照，适合先筛选地点，再核实开放与服务信息。">
+</p>
+
+
 ## 🚀 在线 Demo
 
 ### [👉 立即打开近邻，查询附近的公共设施](https://holynova.github.io/city-public-facilities/)
@@ -25,6 +32,16 @@
 查询结果仅供出行初步筛选；场所开放状态、医院等级、学校属性和服务范围等信息，请以主管部门或场所官方渠道为准。
 
 详细说明：[数据方法与使用边界](https://holynova.github.io/city-public-facilities/about.html#data-method)
+
+## 本地预览已发布页面
+
+仓库已包含 `docs/` 静态文件，安装 Python 3 后即可预览：
+
+```bash
+python3 -m http.server 8080 --directory docs
+```
+
+打开 [localhost:8080](http://localhost:8080)。此方式直接查看提交的站点快照；数据采集和 TypeScript 开发另需 Node.js 22.x 与项目依赖。
 
 ## 网站发布
 
