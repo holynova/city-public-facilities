@@ -260,7 +260,7 @@ function applyCityUi(city) {
   const cityConfig = CITIES[city];
   addressInput.value = "";
   addressInput.placeholder = `例如：${cityConfig.example}`;
-  dataNote.textContent = `${cityConfig.name}数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛`;
+  dataNote.textContent = `${cityConfig.name}数据目录：GCJ-02 坐标，直线距离，仅供出行初筛`;
   shareKicker.textContent = `${cityConfig.name}公共设施近邻检索`;
   citySelect.setAttribute("aria-label", `切换城市，当前${cityConfig.name}`);
   cityOptions.querySelectorAll("button").forEach((option) => option.setAttribute("aria-pressed", String(option.dataset.city === city)));
@@ -501,7 +501,7 @@ function renderSubgroup(group) {
   const visibleCount = Math.min(DEFAULT_RESULT_LIMIT, places.length);
   const extraIds = places.slice(DEFAULT_RESULT_LIMIT).map((_, index) => `place-${group.category}-${index + DEFAULT_RESULT_LIMIT}`);
   const toggle = extraIds.length ? `<button class="more-results" type="button" aria-expanded="false" aria-controls="${extraIds.join(" ")}" data-more-results data-category="${group.category}"><span>再显示 ${extraIds.length} 处</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>` : "";
-  return `<section class="category-group subgroup" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p><span data-visible-count>${visibleCount}${extraIds.length ? ` / ${places.length}` : ""} 处</span></header>${places.map((place, index) => `<article class="place"${index >= DEFAULT_RESULT_LIMIT ? ` id="place-${group.category}-${index}" data-extra-place hidden` : ""}><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}${toggle}</section>`;
+  return `<section class="category-group subgroup" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p><span data-visible-count>${visibleCount}${extraIds.length ? ` / ${places.length}` : ""} 处</span></header>${places.map((place, index) => `<article class="place"${index >= DEFAULT_RESULT_LIMIT ? ` id="place-${group.category}-${index}" data-extra-place hidden` : ""}><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join("、"))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? "，" + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}${toggle}</section>`;
 }
 
 function toggleMoreResults(toggle) {
@@ -675,10 +675,10 @@ function drawShareHeader(context, share, options) {
   drawTrimmedText(context, `${CITIES[activeCity].name}公共设施近邻`, titleX, logoY + logoSize * .67, titleMaxWidth);
   context.font = `500 ${addressSize}px "Noto Sans SC", sans-serif`;
   drawTrimmedText(context, share.address, margin, headerHeight - 104, textMaxWidth);
-  context.fillStyle = "#b9c4cb";
+  context.fillStyle = "#c9c2b4";
   context.font = `400 ${metaSize}px "Noto Sans SC", sans-serif`;
   const majorCount = share.majorGroups?.length ?? share.groups.length;
-  context.fillText(`${majorCount} 个分组 · ${share.groups.length} 个细分类别 · 按当前展开状态导出 · 直线距离`, margin, headerHeight - 58);
+  context.fillText(`${majorCount} 个分组，${share.groups.length} 个细分类别，按当前展开状态导出，直线距离`, margin, headerHeight - 58);
   if (qrImage) {
     const frameX = width - margin - qrFrame;
     context.fillStyle = "#ffffff";
@@ -689,13 +689,13 @@ function drawShareHeader(context, share, options) {
 
 function drawShareFooter(context, footerY, options) {
   const { width, margin, labelSize, linkSize } = options;
-  context.strokeStyle = "#cdd0cf";
+  context.strokeStyle = "#d3cfc8";
   context.lineWidth = 2;
   context.beginPath();
   context.moveTo(margin, footerY + 16);
   context.lineTo(width - margin, footerY + 16);
   context.stroke();
-  context.fillStyle = "#61707a";
+  context.fillStyle = "#6b6156";
   context.font = `400 ${labelSize}px "Noto Sans SC", sans-serif`;
   context.fillText("打开项目查看实时查询", margin, footerY + 62);
   context.fillStyle = "#10223c";
@@ -713,26 +713,26 @@ function drawShareTile(context, group, x, y, width, height, style) {
   context.fillRect(x, y, width, height);
   context.fillStyle = meta.color;
   context.fillRect(x, y, width, 8);
-  context.fillStyle = "#18252c";
+  context.fillStyle = "#211d19";
   context.font = `700 ${style.headingSize}px "Noto Sans SC", sans-serif`;
-  drawTrimmedText(context, group.majorLabel ? `${group.majorLabel} · ${meta.label}` : meta.label, x + style.tilePadding, y + 44, width - style.tilePadding * 2 - 110);
-  context.fillStyle = "#61707a";
+  drawTrimmedText(context, group.majorLabel ? `${group.majorLabel}—${meta.label}` : meta.label, x + style.tilePadding, y + 44, width - style.tilePadding * 2 - 110);
+  context.fillStyle = "#6b6156";
   context.font = `400 ${style.countSize}px "Noto Sans SC", sans-serif`;
   context.textAlign = "right";
   context.fillText(`${group.places.length} 个`, x + width - style.tilePadding, y + 44);
   context.textAlign = "left";
   group.places.forEach((place, index) => {
     const rowY = y + style.firstRowOffset + index * style.rowStep;
-    context.strokeStyle = "#e2e3df";
+    context.strokeStyle = "#e3dfd6";
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(x + style.tilePadding, rowY - 25);
     context.lineTo(x + width - style.tilePadding, rowY - 25);
     context.stroke();
-    context.fillStyle = "#7a858b";
+    context.fillStyle = "#7e776c";
     context.font = `600 ${style.numberSize}px system-ui, sans-serif`;
     context.fillText(String(index + 1).padStart(2, "0"), x + style.tilePadding, rowY + 6);
-    context.fillStyle = "#18252c";
+    context.fillStyle = "#211d19";
     context.font = `600 ${style.nameSize}px "Noto Sans SC", sans-serif`;
     const textX = x + style.tilePadding + 40;
     drawTrimmedText(context, place.name, textX, rowY + 5, width - style.tilePadding * 2 - 160);
@@ -741,9 +741,9 @@ function drawShareTile(context, group, x, y, width, height, style) {
     context.textAlign = "right";
     context.fillText(formatDistance(place.distanceMeters), x + width - style.tilePadding, rowY + 5);
     context.textAlign = "left";
-    context.fillStyle = "#61707a";
+    context.fillStyle = "#6b6156";
     context.font = `400 ${style.detailSize}px "Noto Sans SC", sans-serif`;
-    const detail = [place.metroLines?.join(" · "), place.district, place.address].filter(Boolean).join(" · ");
+    const detail = [place.metroLines?.join("、"), place.district, place.address].filter(Boolean).join("，");
     drawTrimmedText(context, detail || "地址待补充", textX, rowY + style.detailOffset, width - style.tilePadding * 2 - 40);
   });
 }
@@ -808,7 +808,7 @@ async function copyProjectLink() {
 
 function renderAlternateNames(place) {
   const alternateNames = (place.alternateNames || []).filter((name) => name !== place.name);
-  return alternateNames.length ? `<p class="merged-names">同址/近邻服务点 · ${escapeHtml(alternateNames.join(" · "))}</p>` : "";
+  return alternateNames.length ? `<p class="merged-names">同址/近邻服务点：${escapeHtml(alternateNames.join("、"))}</p>` : "";
 }
 
 function renderMessage(message, type) {
@@ -858,7 +858,7 @@ function categoryMeta(category) {
   return categories[category] || { label: category, shortLabel: category, color: "#617077" };
 }
 
-function formatDistance(meters) { return meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`; }
+function formatDistance(meters) { return meters < 1000 ? `${meters} 米` : `${(meters / 1000).toFixed(1)} 公里`; }
 function formatCoordinate(latitude, longitude) { return `${latitude.toFixed(5)}°N, ${longitude.toFixed(5)}°E`; }
 function majorGroupId(key) { return `major-${key}`; }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character])); }
